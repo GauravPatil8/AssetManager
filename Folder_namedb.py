@@ -106,22 +106,20 @@ def get_CL(connection):
     
 #START OF PROJECT SPECIFIC FOLDERNAME DATABASE
     
-def psfn_createDB(project_name):        #psfn-> project specific folder name
+def psfn_createT(connection,project_name):        #psfn-> project specific folder name
 
-    db_file=f"{project_name}_database.db"
-
-    psfn_conn=sqlite3.connect(db_file)
-    psfn_cursor=psfn_conn.cursor()
+    
+    psfn_cursor=connection.cursor()
 
     psfn_cursor.execute("""
-    CREATE TABLE IF NOT EXISTS folder_name(
+    CREATE TABLE IF NOT EXISTS {project_name} (
                         idx INTEGER PRIMARY KEY AUTOINCREMENT,
                         folder_name TEXT
     )
     """)
 
     psfn_cursor.execute ("""
-        INSERT OR IGNORE INTO folder_name 
+        INSERT OR IGNORE INTO {project_name} 
         (folder_name) 
         VALUES
         ("Textures"),
@@ -130,20 +128,19 @@ def psfn_createDB(project_name):        #psfn-> project specific folder name
         ("Mocap_data")
                         
     """)
-    psfn_conn.commit()
+    connection.commit()
     psfn_cursor.close()
-    return psfn_conn
 
-def psfn_updateName(connection,folder_name,index):
+def psfn_updateName(connection,folder_name,index,project_name):
     psfn_cursor=connection.cursor()
     psfn_cursor.execute("""
-        UPDATE folder_name SET folder_name=? WHERE idx=?
+        UPDATE {project_name} SET folder_name=? WHERE idx=?
     """,(folder_name,index))
     connection.commit()
 
-def psfn_fetch_folder_name(connection,idx):
+def psfn_fetch_folder_name(connection,idx,project_name):
     cursor=connection.cursor()
-    cursor.execute("SELECT folder_name FROM Folder_name where idx=?",(idx,))
+    cursor.execute("SELECT folder_name FROM {project_name} where idx=?",(idx,))
     folder_name=cursor.fetchone()
     cursor.close()
     return folder_name[0]

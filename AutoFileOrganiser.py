@@ -12,6 +12,16 @@ import time
 import bpy
 
 from Folder_namedb import create_and_populate
+from Folder_namedb import fetch_folder_name
+from Folder_namedb import update_folder_name
+from Folder_namedb import psfn_fetch_folder_name
+from Folder_namedb import psfn_createT
+from Folder_namedb import psfn_closeconn
+from Folder_namedb import psfn_updateName
+from Folder_namedb import table_inMemory
+from Folder_namedb import insert_inMemory
+from Folder_namedb import close_connection
+
 
 
 localtime_atStart=time.time()
@@ -228,13 +238,13 @@ def menu_func(self, context):
 
 
 def on_start():
-    # table_inMemory(connection)
-    # insert_inMemory(connection,localtime_atStart)
+    table_inMemory(connection)
+    insert_inMemory(connection,localtime_atStart)
     pass
 
 def on_exit():
     connection.close()
-    # close_connection()
+    close_connection()
 
 
 
