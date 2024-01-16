@@ -34,10 +34,12 @@ model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
 image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
 mocap_files     = ['bvh']
 
-
-bfp=bpy.data.filepath
-if bfp:
-    blender_folder_path=bpy.path.abspath("//")
+def get_blendfile_folder():
+    bfp=bpy.data.filepath
+    if bfp:
+        return bpy.path.abspath("//")
+    else:
+        return None
 
 
 db_conn=create_and_populate() #database banra
@@ -63,13 +65,6 @@ def set_folder_names():
 
 
 
-def folder_to_monitor(Flag):
-    if Flag=='0':
-        return get_downloads_folder()
-    else: 
-        if blender_folder_path==None:
-                pass
-        # return blender_folder_path
 
 def create_folder(folder_path):
     os.makedirs(folder_path,exist_ok=True)
@@ -90,9 +85,9 @@ def get_downloads_folder():
 
 
 
-def organise():
-    src_folder=folder_to_monitor()
-    dest_folder=blender_folder_path
+def organise(selected_folder):
+    src_folder=selected_folder
+    dest_folder=get_blendfile_folder()
 
 
     with organise_lock:
@@ -128,6 +123,8 @@ def organise():
                             mocap_folder_path=os.path.join(dest_folder,mocap_folder_name)
                             create_folder(mocap_folder_path)
                             shutil.move(file_path,mocap_folder_path)
+                else:
+                    break
             
 
 
@@ -178,43 +175,53 @@ class OBJECT_OT_MonitorFolderOperator(bpy.types.Operator):
     bl_label = "Monitor Folder Operator"
     bl_idname = "object.monitor_folder_operator"
 
-    _monitoring_thread = None
-
-    def modal_handler(self, context):
-        if not context.scene.realtime:
-            self.report({'INFO'}, "Realtime Monitoring Stopped.")
-            return {'CANCELLED'}
-
-        selected_folder = context.scene.monitor_folder
-        self.report({'INFO'}, f"Realtime Monitoring of {selected_folder} Folder")
-        organise()  # Modify as needed
-
-        # Set the monitoring interval (in seconds)
-        interval = 5
-        return interval
-
-    def modal(self, context, event):
-        if event.type == 'TIMER':
-            interval = self.modal_handler(context)
-            return {'PASS_THROUGH'} if interval is None else {'RUNNING_MODAL'}
-        return {'PASS_THROUGH'}
+    _thread = None
+    selected_folder = None  # Class attribute to store selected_folder
 
     def execute(self, context):
-        if context.scene.realtime:
-            self.report({'INFO'}, "Realtime Monitoring Started...")
-            # Start a new thread for monitoring
-            self._monitoring_thread = threading.Thread(target=self.monitoring_thread, args=(context,))
-            self._monitoring_thread.start()
-            bpy.app.timers.register(self.modal, first_interval=0.1)
+
+        monitor_option = bpy.context.scene.monitor_folder  # Assuming you have a property named 'monitor_option'
+
+        # Set 'selected_folder' based on the user's choice
+        if monitor_option == 'downloads':
+            self.selected_folder = get_downloads_folder()
+
+        elif monitor_option == 'files':
+            self.selected_folder = get_blendfile_folder()
+
         else:
-            self.report({'INFO'}, "Realtime Monitoring Stopped.")
+            # Handle the case when the user's choice is unexpected
+            self.selected_folder = get_downloads_folder()  # Replace this with an appropriate default
+
+        if context.scene.realtime:
+            self.report({'INFO'}, f"Realtime Monitoring of {self.selected_folder} Folder")
+            # Start a new thread for monitoring
+            self._thread = threading.Thread(target=self.realtime_monitoring_thread)
+            self._thread.start()
+        else:
+            self.report({'INFO'}, f"Monitoring {self.selected_folder} Folder")
+            # Perform non-realtime monitoring directly
+            self.organise()
+
         return {'FINISHED'}
 
-    def monitoring_thread(self, context):
-        while context.scene.realtime:
-            time.sleep(3)  # Sleep for a short duration to allow the main thread to handle modal updates
+    def realtime_monitoring_thread(self):
+        while bpy.context.scene.realtime:
+            time.sleep(1)
+            # Perform realtime monitoring in a separate thread
+            self.organise()
 
         self.report({'INFO'}, "Realtime Monitoring Stopped.")
+
+    def organise(self):
+        # Call the organise function with the stored selected_folder
+        organise(self.selected_folder)
+
+    def cancel(self, context):
+        # Stop the thread when the operator is canceled
+        if self._thread and self._thread.is_alive():
+            bpy.context.scene.realtime = False  # Stop the realtime condition
+            self._thread.join()  # Wait for the thread to finis
     
 class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
     bl_label = "Organize Folder Operator"
