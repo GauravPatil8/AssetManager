@@ -10,7 +10,7 @@ import os
 import shutil
 import time
 import bpy
-
+import threading
 from Folder_namedb import create_and_populate
 from Folder_namedb import fetch_folder_name
 from Folder_namedb import update_folder_name
@@ -22,11 +22,11 @@ from Folder_namedb import table_inMemory
 from Folder_namedb import insert_inMemory
 from Folder_namedb import close_connection
 
-
+folder_name_flag=None #isse dekh liyo bhai
 
 localtime_atStart=time.time()
 connection=sqlite3.connect(':memory:') # temporary db banaya memory ke andar localtime store karne keliye
-
+organise_lock = threading.Lock() #THREAD SAFTEY KE LIYE
 
 # execute everytime at the beginning code (GLOBALLY DECLARED):
 project_files   = ['max','3ds','blend','c4d','bgeo','geo']
@@ -34,10 +34,7 @@ model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
 image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
 mocap_files     = ['bvh']
 
-images_folder_name   ="Textures"
-project_folder_name  ="projectfiles"
-model_folder_name    ="modelfiles"
-mocap_folder_name    ="mocapfiles"
+
 bfp=bpy.data.filepath
 if bfp:
     blender_folder_path=bpy.path.abspath("//")
@@ -45,6 +42,24 @@ if bfp:
 
 db_conn=create_and_populate() #database banra
 #upar wala code har bar start hone par run hona mangta
+
+
+def set_folder_names():
+    global images_folder_name   
+    global project_folder_name  
+    global model_folder_name    
+    global mocap_folder_name   
+
+    if folder_name_flag =='0':
+        images_folder_name=fetch_folder_name('1')
+        project_folder_name=fetch_folder_name('2')
+        model_folder_name=fetch_folder_name('3')
+        mocap_folder_name=fetch_folder_name('4')
+    else:
+        images_folder_name=psfn_fetch_folder_name('1')
+        project_folder_name=psfn_fetch_folder_name('2')
+        model_folder_name=psfn_fetch_folder_name('3')
+        mocap_folder_name=psfn_fetch_folder_name('4')
 
 
 
@@ -74,56 +89,45 @@ def get_downloads_folder():
     return downloads_folder
 
 
-def realtime_organise():
-    folder_flag  ='0' 
-
-    if blender_folder_path==None: #isse change kardiyo bhai
-        pass                                        #downloads=0 , blender ka folder=1 yaha blender ka button se input lena hai
-    
-    src_folder      =folder_to_monitor(folder_flag)  #ye folder mese files utha ke dusre folder me arrange karega
-    dest_folder     =blender_folder_path
-
-
-    while True:
-        onclick_organise()
-        time.sleep(5)  # while loop ko delay karega
 
 def organise():
-    src_folder=folder_to_monitor('0')
+    src_folder=folder_to_monitor()
     dest_folder=blender_folder_path
 
-    for file in os.listdir(src_folder):
-            
-            file_path=os.path.join(src_folder,file)
 
-            if os.path.getmtime(file_path)>=localtime_atStart: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
+    with organise_lock:
+        for file in os.listdir(src_folder):
+                
+                file_path=os.path.join(src_folder,file)
 
-                if os.path.isfile(file_path):
-                    extension=file.split('.')[-1] # file ka extension extract karra hai
+                if os.path.getmtime(file_path)>=localtime_atStart: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
 
-                    if extension in image_files:
+                    if os.path.isfile(file_path):
+                        extension=file.split('.')[-1] # file ka extension extract karra hai
 
-                        images_folder_path=os.path.join(dest_folder,images_folder_name)
-                        create_folder(images_folder_path)
-                        shutil.move(file_path,images_folder_path)
+                        if extension in image_files:
 
-                    elif extension in project_files:
+                            images_folder_path=os.path.join(dest_folder,images_folder_name)
+                            create_folder(images_folder_path)
+                            shutil.move(file_path,images_folder_path)
 
-                        project_folder_path=os.path.join(dest_folder,project_folder_name)
-                        create_folder(project_folder_path)
-                        shutil.move(file_path,project_folder_path)
+                        elif extension in project_files:
 
-                    elif extension in model_files:
+                            project_folder_path=os.path.join(dest_folder,project_folder_name)
+                            create_folder(project_folder_path)
+                            shutil.move(file_path,project_folder_path)
 
-                        model_folder_path=os.path.join(dest_folder,model_folder_name)
-                        create_folder(model_folder_path)
-                        shutil.move(file_path,model_folder_path)
-                    
-                    elif extension in mocap_files:
+                        elif extension in model_files:
 
-                        mocap_folder_path=os.path.join(dest_folder,mocap_folder_name)
-                        create_folder(mocap_folder_path)
-                        shutil.move(file_path,mocap_folder_path)
+                            model_folder_path=os.path.join(dest_folder,model_folder_name)
+                            create_folder(model_folder_path)
+                            shutil.move(file_path,model_folder_path)
+                        
+                        elif extension in mocap_files:
+
+                            mocap_folder_path=os.path.join(dest_folder,mocap_folder_name)
+                            create_folder(mocap_folder_path)
+                            shutil.move(file_path,mocap_folder_path)
             
 
 
@@ -131,22 +135,9 @@ def organise():
 
 ##### BLENDER UI AND OPERATORS ######
 
-class onclick_organise(bpy.types.Operator):
-    bl_idname="wm.ao_organiser"
-    bl_label="Organise files"
-    
-
-    def execute(self, context):
-        organise()
-        self.report({'INFO'}, "Files Organised")
-        return {'FINISHED'}
-
-
-
-
 class assetOrganiserUI(bpy.types.Panel):
     bl_label="Asset Organiser"
-    bl_idname="Auto_AO"
+    bl_idname="PT_Auto_AO"
     bl_space_type="VIEW_3D"
     bl_region_type="UI"
     bl_category="Asset Organiser"
@@ -187,26 +178,51 @@ class OBJECT_OT_MonitorFolderOperator(bpy.types.Operator):
     bl_label = "Monitor Folder Operator"
     bl_idname = "object.monitor_folder_operator"
 
-    def execute(self, context):
+    _monitoring_thread = None
+
+    def modal_handler(self, context):
+        if not context.scene.realtime:
+            self.report({'INFO'}, "Realtime Monitoring Stopped.")
+            return {'CANCELLED'}
+
         selected_folder = context.scene.monitor_folder
+        self.report({'INFO'}, f"Realtime Monitoring of {selected_folder} Folder")
+        organise()  # Modify as needed
 
+        # Set the monitoring interval (in seconds)
+        interval = 5
+        return interval
+
+    def modal(self, context, event):
+        if event.type == 'TIMER':
+            interval = self.modal_handler(context)
+            return {'PASS_THROUGH'} if interval is None else {'RUNNING_MODAL'}
+        return {'PASS_THROUGH'}
+
+    def execute(self, context):
         if context.scene.realtime:
-            self.report({'INFO'}, f"Realtime Monitoring of {selected_folder} Folder...")
-            # Add your code for realtime monitoring here
+            self.report({'INFO'}, "Realtime Monitoring Started...")
+            # Start a new thread for monitoring
+            self._monitoring_thread = threading.Thread(target=self.monitoring_thread, args=(context,))
+            self._monitoring_thread.start()
+            bpy.app.timers.register(self.modal, first_interval=0.1)
         else:
-            self.report({'INFO'}, f"Monitoring {selected_folder} Folder...")
-            # Add your code for non-realtime monitoring here
-
+            self.report({'INFO'}, "Realtime Monitoring Stopped.")
         return {'FINISHED'}
+
+    def monitoring_thread(self, context):
+        while context.scene.realtime:
+            time.sleep(3)  # Sleep for a short duration to allow the main thread to handle modal updates
+
+        self.report({'INFO'}, "Realtime Monitoring Stopped.")
     
 class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
     bl_label = "Organize Folder Operator"
     bl_idname = "object.organize_folder_operator"
 
     def execute(self, context):
-        self.report({'INFO'}, "Organizing Folder...")
-        # Add your code for organizing the folder here
-
+        self.report({'INFO'}, "Organizing Folder")
+        organise()
         return {'FINISHED'}
     
 class OBJECT_OT_ChangeLogOperator(bpy.types.Operator):
@@ -240,7 +256,7 @@ def menu_func(self, context):
 def on_start():
     table_inMemory(connection)
     insert_inMemory(connection,localtime_atStart)
-    pass
+    
 
 def on_exit():
     connection.close()
