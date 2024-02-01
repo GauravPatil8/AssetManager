@@ -12,60 +12,67 @@ from Folder_namedb import psfn_updateName
 from Folder_namedb import table_inMemory
 from Folder_namedb import insert_inMemory
 from Folder_namedb import close_connection
-from AutoFileOrganiser import localtime_atStart
+import itertools
+# from AutoFileOrganiser import localtime_atStart
 
 global folder_name_flag
 folder_name_flag=None #idhar function daal diyo
 
 # execute everytime at the beginning code (GLOBALLY DECLARED):
-global project_files  
-project_files   = ['max','3ds','blend','c4d','bgeo','geo','sbsar','spsm']
-global model_files     
+
+project_files   = ['max','3ds','blend','c4d','bgeo','geo']
+     
 model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
-global image_files
+
 image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
-global mocap_files
+
 mocap_files     = ['bvh']
-global material_files
+
 material_files  = ['sbsar','spsm','spp','sbs']
 
 
 
 def organise_zip(folder_path,dest_folder):
-    folder_names=[]
-    extensions_count={}
-    for root,dirs,files in os.walk(folder_path):
-        for dir_name in dirs:
-            folder_names.append(dir_name)
-        for file_name in files:
-            extension=file_name.split('.').lower()
-            extensions_count[extension]=extensions_count.get(extension,0)+1
 
-    for target_file in model_files or project_files:
-        if target_file in extensions_count:
-            model_folder_path=os.path.join(dest_folder,model_folder_name)
-            create_folder(model_folder_path)
-            shutil.move(folder_path,model_folder_path)
-        else:
-            images_folder_path=os.path.join(dest_folder,images_folder_name)
-            create_folder(images_folder_path)
-            shutil.move(folder_path,images_folder_path)
-             
-        
-    # for extension in extensions:
-    #     if extension in project_files or model_files:
-    #         model_folder_path=os.path.join(dest_folder,model_folder_name)
-    #         create_folder(model_folder_path)
-    #         shutil.move(folder_path,model_folder_path)
-    #     elif extension in image_files or
+    flag=False
+    extension_dictionary={}
+    folder_path_name=os.path.basename(folder_path).split('.')[0]
+    
+    combined_list = model_files + project_files
+    subdirectory_name = os.path.splitext(os.path.basename(folder_path))[0]
+    with zipfile.ZipFile(folder_path, 'r') as zip_ref:
+        file_names=zip_ref.namelist()  
+    
+    
+    for file in file_names:
+        extension=file.split('.')[-1].lower()
+        if extension in combined_list:
+            extension_dictionary[extension]=extension_dictionary.get(extension,0)+1
+    
+        if extension in extension_dictionary:
+            flag=True
+
             
-          
+    if flag==True:
+        model_folder = os.path.join(dest_folder, "Model_Files")
+        create_folder(model_folder)
+            
+        subdirectory_path=os.path.join(model_folder,subdirectory_name)
+        create_folder(subdirectory_path)
+        with zipfile.ZipFile(folder_path,'r') as zip_ref:
+            zip_ref.extractall(subdirectory_path)
+                        
+    else:
+                        
+        images_folder = os.path.join(dest_folder, "Model_Files")
+        create_folder(images_folder)
+            
+        subdirectory_path=os.path.join(images_folder,subdirectory_name)
+        create_folder(subdirectory_path)
+        with zipfile.ZipFile(folder_path,'r') as zip_ref:
+            zip_ref.extractall(subdirectory_path)
+               
 
-
-
-def extract_zip(zip_file_path,extract_folder):
-    with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
-        zip_ref.extractall(extract_folder)
 
 def set_folder_names():
     global images_folder_name   
@@ -128,14 +135,7 @@ def organiser_utility(dest_folder,extension,file_path):
                     shutil.move(file_path,mocap_folder_path)
 
     elif extension =='zip':
-
-        zipfilename=file_path.split('.')[0]
-        extract_zip(file_path,dest_folder)
-
-        for folder in os.listdir(dest_folder):
-          if os.path.isdir(os.path.join(dest_folder,folder))==zipfilename:
-                organise_zip(os.path.join(dest_folder,folder),dest_folder)
-        
+        organise_zip(file_path,dest_folder)
         os.remove(file_path)
 
 
@@ -175,3 +175,7 @@ def organise():
                
         else:
             break
+
+zip_file_path=R"C:\zipextracttest\used-new-balance-574-classic-free.zip"
+dest_folder=R"C:\zipextracttest"
+organise_zip(zip_file_path,dest_folder)
