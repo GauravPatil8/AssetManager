@@ -12,20 +12,55 @@ from Folder_namedb import psfn_updateName
 from Folder_namedb import table_inMemory
 from Folder_namedb import insert_inMemory
 from Folder_namedb import close_connection
-# from AutoFileOrganiser import localtime_atStart
+from AutoFileOrganiser import localtime_atStart
 
-folder_name_flag=None
+global folder_name_flag
+folder_name_flag=None #idhar function daal diyo
 
-def organise_zip(folder_path):
+# execute everytime at the beginning code (GLOBALLY DECLARED):
+global project_files  
+project_files   = ['max','3ds','blend','c4d','bgeo','geo','sbsar','spsm']
+global model_files     
+model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
+global image_files
+image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
+global mocap_files
+mocap_files     = ['bvh']
+global material_files
+material_files  = ['sbsar','spsm','spp','sbs']
+
+
+
+def organise_zip(folder_path,dest_folder):
     folder_names=[]
-    file_names=[]
-    for dirs,files in os.walk(folder_path):
+    extensions_count={}
+    for root,dirs,files in os.walk(folder_path):
         for dir_name in dirs:
             folder_names.append(dir_name)
         for file_name in files:
-            file_names.append(file_name)
-    
-    
+            extension=file_name.split('.').lower()
+            extensions_count[extension]=extensions_count.get(extension,0)+1
+
+    for target_file in model_files or project_files:
+        if target_file in extensions_count:
+            model_folder_path=os.path.join(dest_folder,model_folder_name)
+            create_folder(model_folder_path)
+            shutil.move(folder_path,model_folder_path)
+        else:
+            images_folder_path=os.path.join(dest_folder,images_folder_name)
+            create_folder(images_folder_path)
+            shutil.move(folder_path,images_folder_path)
+             
+        
+    # for extension in extensions:
+    #     if extension in project_files or model_files:
+    #         model_folder_path=os.path.join(dest_folder,model_folder_name)
+    #         create_folder(model_folder_path)
+    #         shutil.move(folder_path,model_folder_path)
+    #     elif extension in image_files or
+            
+          
+
 
 
 def extract_zip(zip_file_path,extract_folder):
@@ -66,13 +101,53 @@ def get_downloads_folder():
         raise OSError("Unsupported Operating System")
     return downloads_folder
 
-# execute everytime at the beginning code (GLOBALLY DECLARED):
-project_files   = ['max','3ds','blend','c4d','bgeo','geo','sbsar','spsm']
-model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
-image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
-mocap_files     = ['bvh']
-material_files  = ['sbsar','spsm','spp','sbs']
 
+def organiser_utility(dest_folder,extension,file_path):
+    if extension in image_files:
+
+                    images_folder_path=os.path.join(dest_folder,images_folder_name)
+                    create_folder(images_folder_path)
+                    shutil.move(file_path,images_folder_path)
+
+    elif extension in project_files:
+
+                    project_folder_path=os.path.join(dest_folder,project_folder_name)
+                    create_folder(project_folder_path)
+                    shutil.move(file_path,project_folder_path)
+
+    elif extension in model_files:
+
+                    model_folder_path=os.path.join(dest_folder,model_folder_name)
+                    create_folder(model_folder_path)
+                    shutil.move(file_path,model_folder_path)
+                        
+    elif extension in mocap_files:
+
+                    mocap_folder_path=os.path.join(dest_folder,mocap_folder_name)
+                    create_folder(mocap_folder_path)
+                    shutil.move(file_path,mocap_folder_path)
+
+    elif extension =='zip':
+
+        zipfilename=file_path.split('.')[0]
+        extract_zip(file_path,dest_folder)
+
+        for folder in os.listdir(dest_folder):
+          if os.path.isdir(os.path.join(dest_folder,folder))==zipfilename:
+                organise_zip(os.path.join(dest_folder,folder),dest_folder)
+        
+        os.remove(file_path)
+
+
+    elif extension =='hdr':
+        hdri_folder_path=os.path.join(dest_folder,"HDRI_Images")
+        create_folder(hdri_folder_path)
+        shutil.move(file_path,hdri_folder_path)
+
+    elif extension in material_files:
+        material_folder_path=os.path.join(dest_folder,"Materials")
+        create_folder(material_folder_path)
+        shutil.move(file_path,material_folder_path)
 
 
 def get_blendfile_folder():
@@ -87,8 +162,6 @@ def organise():
     src_folder=R"C:\zipextracttest"
     dest_folder=R"C:\zipextracttest"
 
-
-
     for file in os.listdir(src_folder):
                                 
         file_path=os.path.join(src_folder,file)
@@ -96,52 +169,9 @@ def organise():
         if os.path.getmtime(file_path)>=localtime_atStart: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
 
             if os.path.isfile(file_path):
-                extension=file.split('.')[-1] # file ka extension extract karra hai
-
-                if extension in image_files:
-
-                    images_folder_path=os.path.join(dest_folder,images_folder_name)
-                    create_folder(images_folder_path)
-                    shutil.move(file_path,images_folder_path)
-
-                elif extension in project_files:
-
-                    project_folder_path=os.path.join(dest_folder,project_folder_name)
-                    create_folder(project_folder_path)
-                    shutil.move(file_path,project_folder_path)
-
-                elif extension in model_files:
-
-                    model_folder_path=os.path.join(dest_folder,model_folder_name)
-                    create_folder(model_folder_path)
-                    shutil.move(file_path,model_folder_path)
-                        
-                elif extension in mocap_files:
-
-                    mocap_folder_path=os.path.join(dest_folder,mocap_folder_name)
-                    create_folder(mocap_folder_path)
-                    shutil.move(file_path,mocap_folder_path)
-
-                elif extension =='zip':
-                    zipfilename=file_path.split('.')[0]
-                    extract_zip(file_path,dest_folder)
-                    os.listdir(dest_folder)
-                    for folder in os.listdir(dest_folder):
-                        if os.path.isdir(os.path.join(dest_folder,folder))==zipfilename:
-                            organise_zip(os.path.join(dest_folder,folder))
-
-
-                elif extension =='hdr':
-                    hdri_folder_path=os.path.join(dest_folder,"HDRI_Images")
-                    create_folder(hdri_folder_path)
-                    shutil.move(file_path,hdri_folder_path)
-
-                elif extension in material_files:
-                    material_folder_path=os.path.join(dest_folder,"Materials")
-                    create_folder(material_folder_path)
-                    shutil.move(file_path,material_folder_path)
-
-
-
+                extension=file.split('.')[-1].lower() # file ka extension extract karra hai
+            
+            organiser_utility(dest_folder,extension,file_path)
+               
         else:
             break
