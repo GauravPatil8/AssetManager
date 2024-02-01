@@ -16,6 +16,18 @@ from Folder_namedb import close_connection
 
 folder_name_flag=None
 
+def organise_zip(folder_path):
+    folder_names=[]
+    file_names=[]
+    for dirs,files in os.walk(folder_path):
+        for dir_name in dirs:
+            folder_names.append(dir_name)
+        for file_name in files:
+            file_names.append(file_name)
+    
+    
+
+
 def extract_zip(zip_file_path,extract_folder):
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         zip_ref.extractall(extract_folder)
@@ -55,10 +67,12 @@ def get_downloads_folder():
     return downloads_folder
 
 # execute everytime at the beginning code (GLOBALLY DECLARED):
-project_files   = ['max','3ds','blend','c4d','bgeo','geo']
+project_files   = ['max','3ds','blend','c4d','bgeo','geo','sbsar','spsm']
 model_files     = ['obj','fbx','usdz','dae','usd*','ply','glb','gltf','x3d']
 image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','raw','svg','ai','tif',]
 mocap_files     = ['bvh']
+material_files  = ['sbsar','spsm','spp','sbs']
+
 
 
 def get_blendfile_folder():
@@ -109,23 +123,25 @@ def organise():
                     shutil.move(file_path,mocap_folder_path)
 
                 elif extension =='zip':
+                    zipfilename=file_path.split('.')[0]
                     extract_zip(file_path,dest_folder)
+                    os.listdir(dest_folder)
+                    for folder in os.listdir(dest_folder):
+                        if os.path.isdir(os.path.join(dest_folder,folder))==zipfilename:
+                            organise_zip(os.path.join(dest_folder,folder))
+
+
+                elif extension =='hdr':
+                    hdri_folder_path=os.path.join(dest_folder,"HDRI_Images")
+                    create_folder(hdri_folder_path)
+                    shutil.move(file_path,hdri_folder_path)
+
+                elif extension in material_files:
+                    material_folder_path=os.path.join(dest_folder,"Materials")
+                    create_folder(material_folder_path)
+                    shutil.move(file_path,material_folder_path)
+
 
 
         else:
             break
-
-def unziptest():
-    src_folder=R"C:\zipextracttest"
-    dest_folder=R"C:\zipextracttest"
-    for file in os.listdir(src_folder):
-        file_path=os.path.join(src_folder,file)
-
-        if os.path.isfile(file_path):
-            extension=file.split('.')[-1]
-            if extension =='zip':
-                extract_zip(file_path,dest_folder)
-                print("Extraction complete")
-
-
-unziptest()
