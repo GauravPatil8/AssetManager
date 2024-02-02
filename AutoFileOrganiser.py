@@ -7,8 +7,6 @@
 #CODE STARTS:
 
 import sqlite3
-import os
-import shutil
 import time
 import bpy
 import threading
@@ -26,30 +24,30 @@ from Folder_namedb import table_inMemory
 from Folder_namedb import insert_inMemory
 from Folder_namedb import close_connection
 
-folder_name_flag=None #isse dekh liyo bhai
+
 
 localtime_atStart=time.time()
 connection=sqlite3.connect(':memory:') # temporary db banaya memory ke andar localtime store karne keliye
-organise_lock = threading.Lock() #THREAD SAFTEY KE LIYE
-
 
 db_conn=create_and_populate() #database banra
+
 #upar wala code har bar start hone par run hona mangta
 
-
-
-
-
-
-
-
-
-
-
-
-
 ##### BLENDER UI AND OPERATORS ######
+def is_blend_file_saved():
+    if bpy.data.filepath == "":
+        return False
+    else:
+        return True
+    
+def show_error_dialog():
+    bpy.ops.wm.popup_message(
+        title="Error",
+        message="Blend file must be saved before proceeding.",
+        icon='ERROR'
+    )
 
+    
 class assetOrganiserUI(bpy.types.Panel):
     bl_label="Asset Organiser"
     bl_idname="PT_Auto_AO"
@@ -89,65 +87,87 @@ class assetOrganiserUI(bpy.types.Panel):
             row = layout.row(align=True)
             row.operator("object.organize_folder_operator", text="Organize Folder")
 
-class OBJECT_OT_MonitorFolderOperator(bpy.types.Operator):
-    bl_label = "Monitor Folder Operator"
-    bl_idname = "object.monitor_folder_operator"
+# class OBJECT_OT_MonitorFolderOperator(bpy.types.Operator):
+#     bl_label = "Monitor Folder Operator"
+#     bl_idname = "object.monitor_folder_operator"
 
-    _thread = None
-    selected_folder = None  # Class attribute to store selected_folder
+#     _thread = None
+#     selected_folder = None  # Class attribute to store selected_folder
 
-    def execute(self, context):
+#     def execute(self, context):
 
-        monitor_option = bpy.context.scene.monitor_folder  # Assuming you have a property named 'monitor_option'
+#         monitor_option = bpy.context.scene.monitor_folder  # Assuming you have a property named 'monitor_option'
 
-        # Set 'selected_folder' based on the user's choice
-        if monitor_option == 'downloads':
-            self.selected_folder = get_downloads_folder()
+#         # Set 'selected_folder' based on the user's choice
+#         if monitor_option == 'downloads':
+#             self.selected_folder = get_downloads_folder()
 
-        elif monitor_option == 'files':
-            self.selected_folder = get_blendfile_folder()
+#         elif monitor_option == 'files':
+#             self.selected_folder = get_blendfile_folder()
 
-        else:
-            # Handle the case when the user's choice is unexpected
-            self.selected_folder = get_downloads_folder()  # Replace this with an appropriate default
+#         else:
+#             # Handle the case when the user's choice is unexpected
+#             self.selected_folder = get_downloads_folder()  # Replace this with an appropriate default
 
-        if context.scene.realtime:
-            self.report({'INFO'}, f"Realtime Monitoring of {self.selected_folder} Folder")
-            # Start a new thread for monitoring
-            self._thread = threading.Thread(target=self.realtime_monitoring_thread)
-            self._thread.start()
-        else:
-            self.report({'INFO'}, f"Monitoring {self.selected_folder} Folder")
-            # Perform non-realtime monitoring directly
-            self.organise()
+#         if context.scene.realtime:
+#             self.report({'INFO'}, f"Realtime Monitoring of {self.selected_folder} Folder")
+#             # Start a new thread for monitoring
+#             self._thread = threading.Thread(target=self.realtime_monitoring_thread)
+#             self._thread.start()
+#         else:
+#             self.report({'INFO'}, f"Monitoring {self.selected_folder} Folder")
+#             # Perform non-realtime monitoring directly
+#             self.organise()
 
-        return {'FINISHED'}
+#         return {'FINISHED'}
 
-    def realtime_monitoring_thread(self):
-        while bpy.context.scene.realtime:
-            time.sleep(1)
-            # Perform realtime monitoring in a separate thread
-            self.organise()
+#     def realtime_monitoring_thread(self):
+#         while bpy.context.scene.realtime:
+#             time.sleep(1)
+#             # Perform realtime monitoring in a separate thread
+#             self.organise()
 
-        self.report({'INFO'}, "Realtime Monitoring Stopped.")
+#         self.report({'INFO'}, "Realtime Monitoring Stopped.")
 
-    def organise(self):
-        # Call the organise function with the stored selected_folder
-        organise(self.selected_folder)
+#     def organise(self):
+#         # Call the organise function with the stored selected_folder
+#         organise(self.selected_folder)
 
-    def cancel(self, context):
-        # Stop the thread when the operator is canceled
-        if self._thread and self._thread.is_alive():
-            bpy.context.scene.realtime = False  # Stop the realtime condition
-            self._thread.join()  # Wait for the thread to finis
+#     def cancel(self, context):
+#         # Stop the thread when the operator is canceled
+#         if self._thread and self._thread.is_alive():
+#             bpy.context.scene.realtime = False  # Stop the realtime condition
+#             self._thread.join()  # Wait for the thread to finis
     
 class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
     bl_label = "Organize Folder Operator"
     bl_idname = "object.organize_folder_operator"
 
     def execute(self, context):
+
         self.report({'INFO'}, "Organizing Folder")
-        organise()
+
+        folder_to_monitor=context.scene.monitor_folder
+
+        if is_blend_file_saved():
+            destination_folder=get_blendfile_folder()
+        else:
+            destination_folder=None
+
+            
+        if folder_to_monitor =="downloads":
+            src_folder=get_downloads_folder()
+            
+        else:
+            if is_blend_file_saved():
+                src_folder=get_blendfile_folder()
+                
+            else:
+                show_error_dialog()
+                bpy.context.scene.monitor_folder='downloads'
+
+
+        organise(src_folder,destination_folder)
         return {'FINISHED'}
     
 class OBJECT_OT_ChangeLogOperator(bpy.types.Operator):
@@ -196,7 +216,7 @@ def register():
     bpy.app.handlers.load_post.append(on_start)
     bpy.app.handlers.save_pre.append(on_exit)
     bpy.utils.register_class(assetOrganiserUI)
-    bpy.utils.register_class(OBJECT_OT_MonitorFolderOperator)
+    # bpy.utils.register_class(OBJECT_OT_MonitorFolderOperator)
     bpy.utils.register_class(OBJECT_OT_OrganizeFolderOperator)
     bpy.utils.register_class(OBJECT_OT_ChangeLogOperator)
     bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
@@ -242,7 +262,7 @@ def unregister():
     bpy.app.handlers.load_post.remove(on_start)
     bpy.app.handlers.save_pre.remove(on_exit)
     bpy.utils.unregister_class(assetOrganiserUI)
-    bpy.utils.unregister_class(OBJECT_OT_MonitorFolderOperator)
+    # bpy.utils.unregister_class(OBJECT_OT_MonitorFolderOperator)
     bpy.utils.unregister_class(OBJECT_OT_OrganizeFolderOperator)
     bpy.utils.unregister_class(OBJECT_OT_ChangeLogOperator)
     del bpy.types.Scene.monitor_folder
@@ -254,4 +274,3 @@ def unregister():
     bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
 
 # register()
-on_start()
