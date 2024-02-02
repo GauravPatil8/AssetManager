@@ -12,11 +12,21 @@ from Folder_namedb import psfn_updateName
 from Folder_namedb import table_inMemory
 from Folder_namedb import insert_inMemory
 from Folder_namedb import close_connection
-import itertools
-# from AutoFileOrganiser import localtime_atStart
+from AutoFileOrganiser import localtime_atStart
 
-global folder_name_flag
-folder_name_flag=None #idhar function daal diyo
+
+folder_name_flag='0' #idhar function daal diyo
+
+if folder_name_flag =='0':
+    images_folder_name=fetch_folder_name('1')
+    project_folder_name=fetch_folder_name('2')
+    model_folder_name=fetch_folder_name('3')
+    mocap_folder_name=fetch_folder_name('4')
+else:
+    images_folder_name=psfn_fetch_folder_name('1')
+    project_folder_name=psfn_fetch_folder_name('2')
+    model_folder_name=psfn_fetch_folder_name('3')
+    mocap_folder_name=psfn_fetch_folder_name('4')
 
 # execute everytime at the beginning code (GLOBALLY DECLARED):
 
@@ -34,12 +44,13 @@ material_files  = ['sbsar','spsm','spp','sbs']
 
 def organise_zip(folder_path,dest_folder):
 
-    flag=False
+    flag=False                          
     extension_dictionary={}
-    folder_path_name=os.path.basename(folder_path).split('.')[0]
     
     combined_list = model_files + project_files
+
     subdirectory_name = os.path.splitext(os.path.basename(folder_path))[0]
+
     with zipfile.ZipFile(folder_path, 'r') as zip_ref:
         file_names=zip_ref.namelist()  
     
@@ -51,6 +62,7 @@ def organise_zip(folder_path,dest_folder):
     
         if extension in extension_dictionary:
             flag=True
+    
 
             
     if flag==True:
@@ -72,24 +84,6 @@ def organise_zip(folder_path,dest_folder):
         with zipfile.ZipFile(folder_path,'r') as zip_ref:
             zip_ref.extractall(subdirectory_path)
                
-
-
-def set_folder_names():
-    global images_folder_name   
-    global project_folder_name  
-    global model_folder_name    
-    global mocap_folder_name   
-
-    if folder_name_flag =='0':
-        images_folder_name=fetch_folder_name('1')
-        project_folder_name=fetch_folder_name('2')
-        model_folder_name=fetch_folder_name('3')
-        mocap_folder_name=fetch_folder_name('4')
-    else:
-        images_folder_name=psfn_fetch_folder_name('1')
-        project_folder_name=psfn_fetch_folder_name('2')
-        model_folder_name=psfn_fetch_folder_name('3')
-        mocap_folder_name=psfn_fetch_folder_name('4')
 
 def create_folder(folder_path):
     os.makedirs(folder_path,exist_ok=True)
@@ -140,12 +134,12 @@ def organiser_utility(dest_folder,extension,file_path):
 
 
     elif extension =='hdr':
-        hdri_folder_path=os.path.join(dest_folder,"HDRI_Images")
+        hdri_folder_path=os.path.join(dest_folder,images_folder_name,"HDRI_Images")
         create_folder(hdri_folder_path)
         shutil.move(file_path,hdri_folder_path)
 
     elif extension in material_files:
-        material_folder_path=os.path.join(dest_folder,"Materials")
+        material_folder_path=os.path.join(dest_folder,project_folder_name,"Materials") #project files ke jagah db name daal diyo
         create_folder(material_folder_path)
         shutil.move(file_path,material_folder_path)
 
@@ -158,9 +152,8 @@ def get_blendfile_folder():
         return None
     
 
-def organise():
-    src_folder=R"C:\zipextracttest"
-    dest_folder=R"C:\zipextracttest"
+def organise(src_folder,destination_folder):
+    
 
     for file in os.listdir(src_folder):
                                 
@@ -171,11 +164,7 @@ def organise():
             if os.path.isfile(file_path):
                 extension=file.split('.')[-1].lower() # file ka extension extract karra hai
             
-            organiser_utility(dest_folder,extension,file_path)
+            organiser_utility(destination_folder,extension,file_path)
                
         else:
             break
-
-zip_file_path=R"C:\zipextracttest\used-new-balance-574-classic-free.zip"
-dest_folder=R"C:\zipextracttest"
-organise_zip(zip_file_path,dest_folder)
