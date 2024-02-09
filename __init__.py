@@ -3,7 +3,7 @@
 #     "blender": (4, 0, 2),
 #     "category": "System", 
 #     "author": "Swami",
-#     "version": (1, 0, 0),
+#     "version": (0, 0, 1),
 #     "location": "View3D > UI> Asset Organiser",
 #     "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset management system.",
 #     "warning": "",
@@ -20,15 +20,16 @@ script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
 
-from AAO_OT_Organise import OBJECT_OT_Selectedfoldername
+from AAO_OT_Onclick_Organise import OBJECT_OT_Onclick_Organise
 from AAO_PT_AddonUI import OBJECT_PT_AssetManagerUI
-classes=(OBJECT_OT_Selectedfoldername,OBJECT_PT_AssetManagerUI) 
+classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI) 
+
 
 def register():
     for kls in classes:
-        bpy.utils.register_class(kls)
+            bpy.utils.register_class(kls)
 def unregister():
-    for kls in classes:
+    for kls in reversed(classes):
         bpy.utils.unregister_class(kls)
 
 register()
