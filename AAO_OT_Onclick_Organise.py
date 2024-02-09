@@ -1,27 +1,42 @@
+import sys 
 import bpy
+import os
+script_path = os.path.abspath(__file__)
+package_path = os.path.dirname(script_path)
+sys.path.append(package_path)
+from AAO_UT_FileHandler import organise
+from AAO_UT_FileHandler import is_blend_file_saved
+from AAO_UT_FileHandler import get_blendfile_folder
+from AAO_UT_FileHandler import get_downloads_folder
+from AAO_UT_FileHandler import create_folder
+
+localtime_atStart = 1707375615.0  # temporary
 
 bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
-        items=[
-            ('downloads', 'Monitor Downloads Folder', 'Monitor Downloads Folder'),
-            ('files', 'Monitor File Folder', 'Monitor File Folder'),
-        ],
-        default='downloads',
-    )
+    items=[
+        ('DOWNLOADS', 'Monitor Downloads Folder', 'This option enables monitoring of the downloads folder for newly added files.'),
+        ('BLENDFOLDER', 'Monitor Blender File Folder', 'This option enables monitoring of the folder where your Blender file is saved for newly added files.'),
+    ],
+    default='DOWNLOADS',
+)
 
-class OBJECT_OT_Selectedfoldername(bpy.types.Operator):
-    bl_label='Print folder name'
-    bl_idname="object.printfoldername"
+class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
+    bl_label = 'onlick_organise'
+    bl_idname = "object.onclickorganise"
+    bl_description = "Clicking this organizes downloaded files"
 
-    def execute(self,context):
-
-        selected_folder=context.scene.monitor_folder
-
-        if selected_folder=='downloads':
-            print("download folder selected hai bhai")
+    def execute(self, context):
+        selected_folder = context.scene.monitor_folder
+        temporary_folder = None  # Define temporary_folder outside the if block
+        
+        if selected_folder == 'DOWNLOADS':
+            temporary_folder = os.path.join(get_downloads_folder(), "Temp")
+            create_folder(temporary_folder)
+            print(temporary_folder)
+            print("kaam karra hu")  
+            organise('0', temporary_folder)                
         else:
-            print("Blendfile ka folder selected hai bhai")
+            organise('1', get_blendfile_folder(), localtime_atStart)
 
+        
         return {'FINISHED'}
-
-
-
