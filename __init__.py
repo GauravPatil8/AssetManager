@@ -1,31 +1,35 @@
-bl_info = {
-    "name": "Realtime Asset Manager",
-    "blender": (4, 0, 2),
-    "category": "System", 
-    "author": "Swami",
-    "version": (1, 0, 0),
-    "location": "View3D > UI> Asset Organiser",
-    "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset management system.",
-    "warning": "",
-    # "wiki_url": "URL to your addon's documentation or wiki",
-    # "tracker_url": "URL to your addon's issue tracker",
-    "support": "COMMUNITY",
-    
-}
+# bl_info = {
+#     "name": "Realtime Asset Manager",
+#     "blender": (4, 0, 2),
+#     "category": "System", 
+#     "author": "Swami",
+#     "version": (1, 0, 0),
+#     "location": "View3D > UI> Asset Organiser",
+#     "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset management system.",
+#     "warning": "",
+#     # "wiki_url": "URL to your addon's documentation or wiki",
+#     # "tracker_url": "URL to your addon's issue tracker",
+#     "support": "COMMUNITY",
+# }
+
+
 import sys 
+import bpy
 import os
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
-import AutoFileOrganiser   
+
+from AAO_OT_Organise import OBJECT_OT_Selectedfoldername
+from AAO_PT_AddonUI import OBJECT_PT_AssetManagerUI
+classes=(OBJECT_OT_Selectedfoldername,OBJECT_PT_AssetManagerUI) 
 
 def register():
-
-    AutoFileOrganiser.register()
-
+    for kls in classes:
+        bpy.utils.register_class(kls)
 def unregister():
- 
-    AutoFileOrganiser.unregister()
-
+    for kls in classes:
+        bpy.utils.unregister_class(kls)
 
 register()
+
