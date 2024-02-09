@@ -2,31 +2,24 @@ import os
 import shutil
 import bpy
 import zipfile
-from Folder_namedb import create_and_populate
-from Folder_namedb import fetch_folder_name
-from Folder_namedb import update_folder_name
-from Folder_namedb import psfn_fetch_folder_name
-from Folder_namedb import psfn_createT
-from Folder_namedb import psfn_closeconn
-from Folder_namedb import psfn_updateName
-from Folder_namedb import table_inMemory
-from Folder_namedb import insert_inMemory
-from Folder_namedb import close_connection
-from AutoFileOrganiser import localtime_atStart
+from AAO_DB_FolderNames import create_and_populate
+from AAO_DB_FolderNames import fetch_folder_name
+from AAO_DB_FolderNames import update_folder_name
+from AAO_DB_FolderNames import psfn_fetch_folder_name
+from AAO_DB_FolderNames import psfn_createT
+from AAO_DB_FolderNames import psfn_closeconn
+from AAO_DB_FolderNames import psfn_updateName
+from AAO_DB_FolderNames import table_inMemory
+from AAO_DB_FolderNames import insert_inMemory
+from AAO_DB_FolderNames import close_connection
+
+#temporary hai
+images_folder_name="Textures"
+project_folder_name="Project_files"
+model_folder_name="Model_files"
+mocap_folder_name="Mocap_files"
 
 
-folder_name_flag='0' #idhar function daal diyo
-
-if folder_name_flag =='0':
-    images_folder_name=fetch_folder_name('1')
-    project_folder_name=fetch_folder_name('2')
-    model_folder_name=fetch_folder_name('3')
-    mocap_folder_name=fetch_folder_name('4')
-else:
-    images_folder_name=psfn_fetch_folder_name('1')
-    project_folder_name=psfn_fetch_folder_name('2')
-    model_folder_name=psfn_fetch_folder_name('3')
-    mocap_folder_name=psfn_fetch_folder_name('4')
 
 # execute everytime at the beginning code (GLOBALLY DECLARED):
 
@@ -54,14 +47,23 @@ def organise_zip(folder_path,dest_folder):
     with zipfile.ZipFile(folder_path, 'r') as zip_ref:
         file_names=zip_ref.namelist()  
     
-    
+    blend_file_count=0
+    gltf_file_count=0
     for file in file_names:
         extension=file.split('.')[-1].lower()
         if extension in combined_list:
             extension_dictionary[extension]=extension_dictionary.get(extension,0)+1
-    
+
+            ## handling polyhaven files
+
+            if extension=='blend':
+                blend_file_count+=1
+            elif extension=='gltf':
+                gltf_file_count+=1
+                      
         if extension in extension_dictionary:
-            flag=True
+            if not  blend_file_count and gltf_file_count == 1:
+                flag=True
     
 
             
@@ -76,7 +78,7 @@ def organise_zip(folder_path,dest_folder):
                         
     else:
                         
-        images_folder = os.path.join(dest_folder, "Model_Files")
+        images_folder = os.path.join(dest_folder, "Image_Files")
         create_folder(images_folder)
             
         subdirectory_path=os.path.join(images_folder,subdirectory_name)
@@ -152,19 +154,20 @@ def get_blendfile_folder():
         return None
     
 
-def organise(src_folder,destination_folder):
+def organise(src_folder,destination_folder,localtime_atStart):
     
+    if destination_folder != None:
+        for file in os.listdir(src_folder):
+                                    
+            file_path=os.path.join(src_folder,file)
 
-    for file in os.listdir(src_folder):
-                                
-        file_path=os.path.join(src_folder,file)
+            if os.path.getmtime(file_path)>=localtime_atStart: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
 
-        if os.path.getmtime(file_path)>=localtime_atStart: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
+                if os.path.isfile(file_path):
+                    extension=file.split('.')[-1].lower() # file ka extension extract karra hai
+                
+                organiser_utility(destination_folder,extension,file_path)
+                
+            else:
+                break
 
-            if os.path.isfile(file_path):
-                extension=file.split('.')[-1].lower() # file ka extension extract karra hai
-            
-            organiser_utility(destination_folder,extension,file_path)
-               
-        else:
-            break
