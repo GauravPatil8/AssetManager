@@ -1,9 +1,11 @@
 import sys 
 import bpy
 import os
+
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
+
 from AAO_UT_FileHandler import organise
 from AAO_UT_FileHandler import is_blend_file_saved
 from AAO_UT_FileHandler import get_blendfile_folder
@@ -30,11 +32,14 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
         temporary_folder = None  # Define temporary_folder outside the if block
         
         if selected_folder == 'DOWNLOADS':
-            temporary_folder = os.path.join(get_downloads_folder(), "Temp")
-            create_folder(temporary_folder)
-            print(temporary_folder)
-            print("kaam karra hu")  
-            organise('0', temporary_folder)                
+            if is_blend_file_saved():
+                organise('0', get_blendfile_folder(), localtime_atStart)
+            else:
+                temporary_folder = os.path.join(get_downloads_folder(), "Temp")
+                create_folder(temporary_folder)
+                print(temporary_folder)
+                print("kaam karra hu")  
+                organise('0', temporary_folder,localtime_atStart)                
         else:
             organise('1', get_blendfile_folder(), localtime_atStart)
 
