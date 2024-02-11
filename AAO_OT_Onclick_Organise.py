@@ -64,7 +64,9 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
         else:
             if is_blend_file_saved():
                 organise('1', blender_folder, local_time_at_start)
-
+            else:
+                self.report({'ERROR'},"Blender file has not been saved. Please save your Blender file before utilizing this option.")
+                context.scene.monitor_folder='DOWNLOADS'
         
         return {'FINISHED'}
 
