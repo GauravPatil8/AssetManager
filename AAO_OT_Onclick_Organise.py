@@ -1,6 +1,7 @@
 import sys 
 import bpy
 import os
+import time
 
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
@@ -8,11 +9,27 @@ sys.path.append(package_path)
 
 from AAO_UT_FileHandler import organise
 from AAO_UT_FileHandler import is_blend_file_saved
-from AAO_UT_FileHandler import get_blendfile_folder
 from AAO_UT_FileHandler import get_downloads_folder
 from AAO_UT_FileHandler import create_folder
+from AAO_UT_FileHandler import get_blendfile_folder
 
-localtime_atStart = 1707375615.0  # temporary
+blender_folder=None
+save_count=0
+local_time_at_start=None
+
+def on_start(dummy):
+    global local_time_at_start
+    local_time_at_start=time.time()
+    print("on start time: ",local_time_at_start)
+
+
+def blender_folder_on_saved(dummy):
+    global save_count
+    if save_count==0:
+        global blender_folder
+        blender_folder=get_blendfile_folder()
+    save_count+=1
+
 
 bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
     items=[
@@ -27,21 +44,27 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     bl_idname = "object.onclickorganise"
     bl_description = "Clicking this organizes downloaded files"
 
+    on_start(None)
+
     def execute(self, context):
         selected_folder = context.scene.monitor_folder
         temporary_folder = None  # Define temporary_folder outside the if block
         
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
-                organise('0', get_blendfile_folder(), localtime_atStart)
+                organise('0', blender_folder, local_time_at_start)
+
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), "Temp")
                 create_folder(temporary_folder)
                 print(temporary_folder)
                 print("kaam karra hu")  
-                organise('0', temporary_folder,localtime_atStart)                
+                print("onclick pe time: ",local_time_at_start)
+                organise('0', temporary_folder,local_time_at_start)                
         else:
-            organise('1', get_blendfile_folder(), localtime_atStart)
+            if is_blend_file_saved():
+                organise('1', blender_folder, local_time_at_start)
 
         
         return {'FINISHED'}
+
