@@ -23,26 +23,34 @@ sys.path.append(package_path)
 from AAO_OT_Onclick_Organise import OBJECT_OT_Onclick_Organise
 from AAO_OT_Onclick_Organise import on_start
 from AAO_OT_Onclick_Organise import blender_folder_on_saved
+from AAO_OT_Update_folder_name import OBJECT_OT_update_foldername
 from AAO_PT_AddonUI import OBJECT_PT_AssetManagerUI
 
 
 
 
-classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI) 
+classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI,OBJECT_OT_update_foldername) 
 
 
 
 def register():
+    bpy.types.Scene.custom_folder_name = bpy.props.StringProperty(
+        name="Enter Folder Name",
+        description="Enter a custom folder name",
+        default="",
+    )
     bpy.app.handlers.load_post.append(on_start)
     bpy.app.handlers.save_post.append(blender_folder_on_saved)
     for kls in classes:
             bpy.utils.register_class(kls)
 
 def unregister():
+    
     bpy.app.handlers.load_post.remove(on_start)
     bpy.app.handlers.save_post.remove(blender_folder_on_saved)
     for kls in reversed(classes):
         bpy.utils.unregister_class(kls)
+    del bpy.types.Scene.custom_folder_name
 
 register()
 
