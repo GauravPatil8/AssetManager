@@ -2,22 +2,18 @@ import os
 import shutil
 import bpy
 import zipfile
-from AAO_DB_FolderNames import create_and_populate
 from AAO_DB_FolderNames import fetch_folder_name
-from AAO_DB_FolderNames import update_folder_name
-from AAO_DB_FolderNames import psfn_fetch_folder_name
-from AAO_DB_FolderNames import psfn_createT
-from AAO_DB_FolderNames import psfn_closeconn
-from AAO_DB_FolderNames import psfn_updateName
+from AAO_DB_FolderNames import create_and_populate
 from AAO_DB_FolderNames import table_inMemory
 from AAO_DB_FolderNames import insert_inMemory
 from AAO_DB_FolderNames import close_connection
 
+database_connection=create_and_populate()
 #temporary hai
-images_folder_name="Textures"
-project_folder_name="Project_files"
-model_folder_name="Model_files"
-mocap_folder_name="Mocap_files"
+images_folder_name=fetch_folder_name(database_connection,1)
+project_folder_name=fetch_folder_name(database_connection,2)
+model_folder_name=fetch_folder_name(database_connection,3)
+mocap_folder_name=fetch_folder_name(database_connection,4)
 
 
 
