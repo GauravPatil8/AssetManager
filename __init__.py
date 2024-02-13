@@ -25,11 +25,13 @@ from AAO_OT_Onclick_Organise import on_start
 from AAO_OT_Onclick_Organise import blender_folder_on_saved
 from AAO_OT_Update_folder_name import OBJECT_OT_update_foldername
 from AAO_PT_AddonUI import OBJECT_PT_AssetManagerUI
+from AAO_OT_Log import OBJECT_OT_log_popup
+from AAO_OT_Log import OBJECT_OT_log
 
 
 
 
-classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI,OBJECT_OT_update_foldername) 
+classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI,OBJECT_OT_update_foldername,OBJECT_OT_log,OBJECT_OT_log_popup) 
 
 
 
