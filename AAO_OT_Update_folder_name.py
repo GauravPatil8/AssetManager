@@ -54,33 +54,35 @@ class OBJECT_OT_update_foldername(bpy.types.Operator):
     bl_idname="object.updatefoldername"
 
     def execute(self,context):
-        #Working test
+        
         folder_name=context.scene.custom_folder_name
         selected_option=context.scene.folder_name
-
-        if selected_option=='project_files':
-            old_folder_name=fetch_folder_name(database_connection,2)
-            update_folder_name(database_connection,2,folder_name)
-            self.report({'INFO'},"Folder name updated successfully")
-            change_in_system(old_folder_name,2)
+        if folder_name !="":
+            if selected_option=='project_files':
+                old_folder_name=fetch_folder_name(database_connection,2)
+                update_folder_name(database_connection,2,folder_name)
+                self.report({'INFO'},"Folder name updated successfully")
+                change_in_system(old_folder_name,2)
+                
+            elif selected_option=='image_files':
+                old_folder_name=fetch_folder_name(database_connection,1)
+                update_folder_name(database_connection,1,folder_name)
+                self.report({'INFO'},"Folder name updated successfully")
+                change_in_system(old_folder_name,1)
             
-        elif selected_option=='image_files':
-            old_folder_name=fetch_folder_name(database_connection,1)
-            update_folder_name(database_connection,1,folder_name)
-            self.report({'INFO'},"Folder name updated successfully")
-            change_in_system(old_folder_name,1)
-        
-        elif selected_option=='mocap_files':
-            old_folder_name=fetch_folder_name(database_connection,4)
-            update_folder_name(database_connection,4,folder_name)
-            self.report({'INFO'},"Folder name updated successfully")
-            change_in_system(old_folder_name,4)
+            elif selected_option=='mocap_files':
+                old_folder_name=fetch_folder_name(database_connection,4)
+                update_folder_name(database_connection,4,folder_name)
+                self.report({'INFO'},"Folder name updated successfully")
+                change_in_system(old_folder_name,4)
 
-        elif selected_option=='model_files':
-            old_folder_name=fetch_folder_name(database_connection,3)
-            update_folder_name(database_connection,3,folder_name)
-            self.report({'INFO'},"Folder name updated successfully")
-            change_in_system(old_folder_name,3)
+            elif selected_option=='model_files':
+                old_folder_name=fetch_folder_name(database_connection,3)
+                update_folder_name(database_connection,3,folder_name)
+                self.report({'INFO'},"Folder name updated successfully")
+                change_in_system(old_folder_name,3)
+        else:
+            self.report({'ERROR'},"Please input a valid name")
             
 
 
