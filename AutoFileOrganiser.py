@@ -10,19 +10,19 @@ import sqlite3
 import time
 import bpy
 import threading
-from file_organiser import organise
-from file_organiser import get_downloads_folder
-from file_organiser import get_blendfile_folder
-from Folder_namedb import create_and_populate
-from Folder_namedb import fetch_folder_name
-from Folder_namedb import update_folder_name
-from Folder_namedb import psfn_fetch_folder_name
-from Folder_namedb import psfn_createT
-from Folder_namedb import psfn_closeconn
-from Folder_namedb import psfn_updateName
-from Folder_namedb import table_inMemory
-from Folder_namedb import insert_inMemory
-from Folder_namedb import close_connection
+from AAO_UT_FileHandler import organise
+from AAO_UT_FileHandler import get_downloads_folder
+from AAO_UT_FileHandler import get_blendfile_folder
+from AAO_DB_FolderNames import create_and_populate
+from AAO_DB_FolderNames import fetch_folder_name
+from AAO_DB_FolderNames import update_folder_name
+from AAO_DB_FolderNames import psfn_fetch_folder_name
+from AAO_DB_FolderNames import psfn_createT
+from AAO_DB_FolderNames import psfn_closeconn
+from AAO_DB_FolderNames import psfn_updateName
+from AAO_DB_FolderNames import table_inMemory
+from AAO_DB_FolderNames import insert_inMemory
+from AAO_DB_FolderNames import close_connection
 
 
 
@@ -30,7 +30,17 @@ localtime_atStart=time.time()
 connection=sqlite3.connect(':memory:') # temporary db banaya memory ke andar localtime store karne keliye
 
 db_conn=create_and_populate() #database banra
-
+folder_name_flag='0' #idhar function daal diyo
+if folder_name_flag =='0':
+    images_folder_name=fetch_folder_name(db_conn,'1')
+    project_folder_name=fetch_folder_name(db_conn,'2')
+    model_folder_name=fetch_folder_name(db_conn,'3')
+    mocap_folder_name=fetch_folder_name(db_conn,'4')
+else:
+    images_folder_name=psfn_fetch_folder_name('1')
+    project_folder_name=psfn_fetch_folder_name('2')
+    model_folder_name=psfn_fetch_folder_name('3')
+    mocap_folder_name=psfn_fetch_folder_name('4')
 #upar wala code har bar start hone par run hona mangta
 
 ##### BLENDER UI AND OPERATORS ######
@@ -40,15 +50,24 @@ def is_blend_file_saved():
     else:
         return True
     
-def show_error_dialog():
-    bpy.ops.wm.popup_message(
-        title="Error",
-        message="Blend file must be saved before proceeding.",
-        icon='ERROR'
-    )
+class SimpleErrorDialogOperator(bpy.types.Operator):
+    bl_idname = "object.simple_error_dialog"
+    bl_label = "Show Error Dialog"
+    
+    # error_message: bpy.props.StringProperty(default="This is a sample error message.")
+    
+    def execute(self, context):
+        # Display a popup dialog box with the error message
+        bpy.context.window_manager.popup_menu(lambda menu, context: self.popup_function(menu, context, self.error_message),
+                                               title="Error", icon='ERROR')
+        return {'FINISHED'}
+
+    def popup_function(self, menu, context, error_message):
+        layout = menu.layout
+        layout.label(text=error_message)
 
     
-class assetOrganiserUI(bpy.types.Panel):
+class OBJECT_PT_assetOrganiserUI(bpy.types.Panel):
     bl_label="Asset Organiser"
     bl_idname="PT_Auto_AO"
     bl_space_type="VIEW_3D"
@@ -138,7 +157,16 @@ class assetOrganiserUI(bpy.types.Panel):
 #         if self._thread and self._thread.is_alive():
 #             bpy.context.scene.realtime = False  # Stop the realtime condition
 #             self._thread.join()  # Wait for the thread to finis
-    
+            
+
+bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
+        items=[
+            ('downloads', 'Monitor Downloads Folder', 'Monitor Downloads Folder'),
+            ('files', 'Monitor File Folder', 'Monitor File Folder'),
+        ],
+        default='downloads',
+    )
+   
 class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
     bl_label = "Organize Folder Operator"
     bl_idname = "object.organize_folder_operator"
@@ -147,6 +175,8 @@ class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
 
         self.report({'INFO'}, "Organizing Folder")
 
+        
+
         folder_to_monitor=context.scene.monitor_folder
 
         if is_blend_file_saved():
@@ -154,7 +184,7 @@ class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
         else:
             destination_folder=None
 
-            
+
         if folder_to_monitor =="downloads":
             src_folder=get_downloads_folder()
             
@@ -163,11 +193,12 @@ class OBJECT_OT_OrganizeFolderOperator(bpy.types.Operator):
                 src_folder=get_blendfile_folder()
                 
             else:
-                show_error_dialog()
-                bpy.context.scene.monitor_folder='downloads'
+                bpy.ops.object.simple_error_dialog(error_message="Blend file is not saved, and monitor_folder is not 'downloads'")
+                bpy.context.scene.monitor_folder = 'downloads'
+                return {'CANCELLED'}
 
 
-        organise(src_folder,destination_folder)
+        organise(src_folder,destination_folder,localtime_atStart)
         return {'FINISHED'}
     
 class OBJECT_OT_ChangeLogOperator(bpy.types.Operator):
@@ -215,17 +246,11 @@ def register():
     
     bpy.app.handlers.load_post.append(on_start)
     bpy.app.handlers.save_pre.append(on_exit)
-    bpy.utils.register_class(assetOrganiserUI)
+    bpy.utils.register_class(OBJECT_PT_assetOrganiserUI)
     # bpy.utils.register_class(OBJECT_OT_MonitorFolderOperator)
     bpy.utils.register_class(OBJECT_OT_OrganizeFolderOperator)
     bpy.utils.register_class(OBJECT_OT_ChangeLogOperator)
-    bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
-        items=[
-            ('downloads', 'Monitor Downloads Folder', 'Monitor Downloads Folder'),
-            ('files', 'Monitor File Folder', 'Monitor File Folder'),
-        ],
-        default='downloads',
-    )
+
     bpy.types.Scene.realtime = bpy.props.BoolProperty(
         name="Realtime Monitoring",
         description="Enable Realtime Monitoring",
@@ -261,7 +286,7 @@ def unregister():
     
     bpy.app.handlers.load_post.remove(on_start)
     bpy.app.handlers.save_pre.remove(on_exit)
-    bpy.utils.unregister_class(assetOrganiserUI)
+    bpy.utils.unregister_class(OBJECT_PT_assetOrganiserUI)
     # bpy.utils.unregister_class(OBJECT_OT_MonitorFolderOperator)
     bpy.utils.unregister_class(OBJECT_OT_OrganizeFolderOperator)
     bpy.utils.unregister_class(OBJECT_OT_ChangeLogOperator)
@@ -273,4 +298,4 @@ def unregister():
     del bpy.types.Scene.project_specific
     bpy.types.VIEW3D_MT_mesh_add.remove(menu_func)
 
-# register()
+register()
