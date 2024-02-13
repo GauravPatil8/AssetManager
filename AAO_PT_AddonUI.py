@@ -29,3 +29,5 @@ class OBJECT_PT_AssetManagerUI(bpy.types.Panel):
             box.prop(context.scene, "custom_folder_name", text="Enter Folder Name")
 
             box.operator("object.updatefoldername", text="Set")
+
+        layout.operator("object.log", text="Log")
