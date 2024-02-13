@@ -46,22 +46,21 @@ def update_folder_name(connection,idx,folder_name):
 #END OF DEFAULT DATABASE
 #FUNCTIONS TO STORE TIMESTAMP IN MEMORY
 
-def table_inMemory(connection):
+def changelog_table_in_memory():
+    connection=sqlite3.connect(':memory:') 
     memcursor=connection.cursor()
-    memcursor.execute("""
-    CREATE TABLE IF NOT EXISTS timestamps(
-                      id INTEGER PRIMARY KEY AUTOINCREMENT,
-                      timestamp TIMESTAMP
-    )
-    """)
+    
     #CHANGELOG TABLE
     memcursor.execute("""
-    CREATE TABLE IF NOT EXISTS changelog(
+    CREATE TABLE IF NOT EXISTS changelog (
                       ID INTEGER PRIMARY KEY AUTOINCREMENT,
                       file_name TEXT,
                       file_path TEXT
     )
     """)
+    connection.commit()
+    memcursor.close()
+    return connection
 
 def insert_inMemory(connection,tstamp):
     memcursor=connection.cursor()
@@ -83,23 +82,23 @@ def get_Tstamp(connection):
 #START OF CHANGE LOG DATABASE CREATION
 
 
-def insert_inCL(connection,fileName,filePath):
+def insert_in_change_log(connection,fileName,filePath):
     cl_cursor=connection.cursor()
 
     cl_cursor.execute("""
-    INSERT OR IGNORE INTO changelog(file_name,file_path)
+    INSERT OR IGNORE INTO changelog (file_name,file_path)
                       VALUES (?,?)
     """,(fileName,filePath))
-
+    
     cl_cursor.close()
 
-def get_CL(connection):
+def get_file_info_change_log(connection):
     cl_cursor=connection.cursor()
     cl_cursor.execute("""
-    SELECT * FROM changelog
+    SELECT file_name,file_path FROM changelog
     """)
 
-    Changelog=cl_cursor.fetchall()
-    return Changelog
+    file_info=cl_cursor.fetchall()
+    return file_info
 
 # END OF CHANGELOG DATABASE
