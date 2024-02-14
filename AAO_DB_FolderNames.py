@@ -44,7 +44,7 @@ def update_folder_name(connection,idx,folder_name):
     cursor.close()
 
 #END OF DEFAULT DATABASE
-#FUNCTIONS TO STORE TIMESTAMP IN MEMORY
+#FUNCTIONS TO STORE change log IN MEMORY
 
 def changelog_table_in_memory():
     connection=sqlite3.connect(':memory:') 
@@ -61,25 +61,6 @@ def changelog_table_in_memory():
     connection.commit()
     memcursor.close()
     return connection
-
-def insert_inMemory(connection,tstamp):
-    memcursor=connection.cursor()
-    memcursor.execute("""
-    INSERT INTO timestamps (timestamp) VALUES (?)
-    """,(tstamp,))
-
-def get_Tstamp(connection):
-    memcursor=connection.cursor()
-    memcursor.execute("""
-    SELECT * FROM timestamps 
-    """)
-
-    ts=memcursor.fetchone()
-    return ts[1]
-
-#END OF TEMPERORY FUNCTIONS
-
-#START OF CHANGE LOG DATABASE CREATION
 
 
 def insert_in_change_log(connection,fileName,filePath):
