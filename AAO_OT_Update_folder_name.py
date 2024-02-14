@@ -4,6 +4,7 @@ from AAO_DB_FolderNames import create_and_populate
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import update_folder_name
 from AAO_OT_Onclick_Organise import blender_folder
+from AAO_UT_FileHandler import database_connection
 
 def get_downloads_folder():
     home_directory=os.path.expanduser('~')
@@ -31,7 +32,6 @@ bpy.types.Scene.folder_name = bpy.props.EnumProperty(
         default='project_files',
     )
 
-database_connection=create_and_populate()
 
 def change_in_system(old_folder_name,index):
     if is_blend_file_saved():
