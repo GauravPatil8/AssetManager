@@ -20,16 +20,24 @@ script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
 
-from AAO_OT_Onclick_Organise import OBJECT_OT_Onclick_Organise
-from AAO_OT_Onclick_Organise import on_start
-from AAO_OT_Onclick_Organise import blender_folder_on_saved
+from AAO_OT_Onclick_Organise   import OBJECT_OT_Onclick_Organise
+from AAO_OT_Onclick_Organise   import ENUM_PROPS_monitor_folder
 from AAO_OT_Update_folder_name import OBJECT_OT_update_foldername
-from AAO_PT_AddonUI import OBJECT_PT_AssetManagerUI
-from AAO_OT_Log import OBJECT_OT_log_popup
-from AAO_OT_Log import OBJECT_OT_log
-from AAO_DB_FolderNames import close_connection
-from AAO_UT_FileHandler import memory_connection
-from AAO_UT_FileHandler import database_connection
+from AAO_OT_Update_folder_name import ENUM_PROPS_Change_folder_name
+from AAO_OT_Update_folder_name import ENUM_PROPS_Folder_name
+from AAO_OT_Update_folder_name import ENUM_PROPS_custom_folder_name
+from AAO_PT_AddonUI            import OBJECT_PT_AssetManagerUI
+from AAO_OT_Log                import OBJECT_OT_log_popup
+from AAO_OT_Log                import OBJECT_OT_log
+from AAO_OT_Monitoring_Type    import OBJECT_OT_monitor_type
+from AAO_OT_Monitoring_Type    import ENUM_PROPS_delay_time
+from AAO_OT_Monitoring_Type    import ENUM_PROPS_monitoring_type
+from AAO_OT_Onclick_Organise   import on_start
+from AAO_OT_Onclick_Organise   import blender_folder_on_saved
+from AAO_DB_FolderNames        import close_connection
+from AAO_UT_FileHandler        import memory_connection
+from AAO_UT_FileHandler        import database_connection
+
 
 
 def on_exit(dummy):
@@ -38,17 +46,12 @@ def on_exit(dummy):
      
      
 
-classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI,OBJECT_OT_update_foldername,OBJECT_OT_log,OBJECT_OT_log_popup) 
+classes=(OBJECT_OT_Onclick_Organise,OBJECT_PT_AssetManagerUI,OBJECT_OT_update_foldername,OBJECT_OT_log,OBJECT_OT_log_popup,OBJECT_OT_monitor_type,ENUM_PROPS_Change_folder_name,ENUM_PROPS_Folder_name,ENUM_PROPS_delay_time,ENUM_PROPS_monitoring_type, ENUM_PROPS_custom_folder_name,ENUM_PROPS_monitor_folder) 
 
 
 
 def register():
-    bpy.types.Scene.custom_folder_name = bpy.props.StringProperty(
-        name="Enter Folder Name",
-        description="Enter a custom folder name",
-        default="",
-    )
-    
+   
     bpy.app.handlers.load_post.append(on_start)
     bpy.app.handlers.save_post.append(blender_folder_on_saved)
     for kls in classes:
