@@ -30,14 +30,14 @@ def blender_folder_on_saved(dummy):
         blender_folder=get_blendfile_folder()
     save_count+=1
 
-
-bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
-    items=[
-        ('DOWNLOADS', 'Monitor Downloads Folder', 'This option enables monitoring of the downloads folder for newly added files.'),
-        ('BLENDFOLDER', 'Monitor Blender File Folder', 'This option enables monitoring of the folder where your Blender file is saved for newly added files.'),
-    ],
-    default='DOWNLOADS',
-)
+class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):
+    bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
+        items=[
+            ('DOWNLOADS', 'Monitor Downloads Folder', 'This option enables monitoring of the downloads folder for newly added files.'),
+            ('BLENDFOLDER', 'Monitor Blender File Folder', 'This option enables monitoring of the folder where your Blender file is saved for newly added files.'),
+        ],
+        default='DOWNLOADS',
+    )
 
 class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     bl_label = 'onlick_organise'
