@@ -16,21 +16,29 @@ def is_blend_file_saved():
     else:
         return True
     
-bpy.types.Scene.change_folder_name = bpy.props.BoolProperty(
-        name="Change Folder Name",
-        description="Enable Changing Folder Name",
-        default=False,  
+class ENUM_PROPS_custom_folder_name(bpy.types.PropertyGroup):   
+    bpy.types.Scene.custom_folder_name = bpy.props.StringProperty(
+        name="Enter Folder Name",
+        description="Enter a custom folder name",
+        default="",
     )
 
-bpy.types.Scene.folder_name = bpy.props.EnumProperty(
-        items=[
-            ('project_files', 'Project Files', 'Project Files'),
-            ('image_files', 'Image Files', 'Image Files'),
-            ('mocap_files', 'Mocap Files', 'Mocap Files'),
-            ('model_files', 'Model Files', 'Model Files'),
-        ],
-        default='project_files',
-    )
+class ENUM_PROPS_Change_folder_name(bpy.types.PropertyGroup):
+    bpy.types.Scene.change_folder_name = bpy.props.BoolProperty(
+            name="Change Folder Name",
+            description="Enable Changing Folder Name",
+            default=False,  
+        )
+class ENUM_PROPS_Folder_name(bpy.types.PropertyGroup):
+    bpy.types.Scene.folder_name = bpy.props.EnumProperty(
+            items=[
+                ('project_files', 'Project Files', 'Project Files'),
+                ('image_files', 'Image Files', 'Image Files'),
+                ('mocap_files', 'Mocap Files', 'Mocap Files'),
+                ('model_files', 'Model Files', 'Model Files'),
+            ],
+            default='project_files',
+        )
 
 
 def change_in_system(old_folder_name,index):
