@@ -12,7 +12,7 @@ Realtime Asset Manager is an addon designed for the 3D software package Blender.
 
 ## Installation
 
-1. Download the addon ZIP file from the [releases](https://github.com/yourusername/Realtime_Asset_Manager/releases) page.
+1. Download the addon ZIP file from the [releases](https://github.com/Gauravpatil-8/AssetManager/releases/tag/v0.1) page.
 2. Open Blender and go to `Edit` > `Preferences`.
 3. Click on the `Add-ons` tab.
 4. Click `Install` and select the downloaded ZIP file.
