@@ -44,42 +44,4 @@ def update_folder_name(connection,idx,folder_name):
     cursor.close()
 
 #END OF DEFAULT DATABASE
-#FUNCTIONS TO STORE change log IN MEMORY
 
-def changelog_table_in_memory():
-    connection=sqlite3.connect(':memory:') 
-    memcursor=connection.cursor()
-    
-    #CHANGELOG TABLE
-    memcursor.execute("""
-    CREATE TABLE IF NOT EXISTS changelog (
-                      ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                      file_name TEXT,
-                      file_path TEXT
-    )
-    """)
-    connection.commit()
-    memcursor.close()
-    return connection
-
-
-def insert_in_change_log(connection,fileName,filePath):
-    cl_cursor=connection.cursor()
-
-    cl_cursor.execute("""
-    INSERT OR IGNORE INTO changelog (file_name,file_path)
-                      VALUES (?,?)
-    """,(fileName,filePath))
-    
-    cl_cursor.close()
-
-def get_file_info_change_log(connection):
-    cl_cursor=connection.cursor()
-    cl_cursor.execute("""
-    SELECT file_name,file_path FROM changelog
-    """)
-
-    file_info=cl_cursor.fetchall()
-    return file_info
-
-# END OF CHANGELOG DATABASE
