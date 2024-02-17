@@ -5,11 +5,8 @@ import zipfile
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import create_and_populate
 from AAO_OT_Log import file_data
-def log_info(file_name,file_path):
-     info_tuple=file_name+","+file_path
-     log_tuple=tuple(info_tuple.split(','))
-     file_data.append(log_tuple)
-     
+
+
 database_connection=create_and_populate()
 #temporary hai
 images_folder_name=fetch_folder_name(database_connection,1)
@@ -30,6 +27,12 @@ image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','ra
 mocap_files     = ['bvh']
 
 material_files  = ['sbsar','spsm','spp','sbs']
+
+
+def log_info(file_name,file_path):
+     info_tuple=file_name+","+file_path
+     log_tuple=tuple(info_tuple.split(','))
+     file_data.append(log_tuple)
 
 def is_blend_file_saved():
     if bpy.data.filepath == "":
