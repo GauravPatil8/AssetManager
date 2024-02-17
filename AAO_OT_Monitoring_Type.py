@@ -10,6 +10,8 @@ from AAO_OT_Onclick_Organise import local_time_at_start
 from AAO_OT_Onclick_Organise import blender_folder
 
 stop_event = threading.Event()
+threads_counter=0
+report_flag=True
 def monitoring_type_prop_update_handler(self, context):
     if self.monitoring_type_prop == 'on-click':
         stop_event.set() 
@@ -80,13 +82,14 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
     
 
     def execute(self, context):
+        global threads_counter
         global stop_event
         stop_event.clear()
-        
-        threading.Thread(target=realtime_monitoring,daemon=True, args=(self,context,stop_event)).start()
-        
-        
-        self.report({'INFO'},"Real-time monitoring has started.")
+        if threads_counter==0:
+            threads_counter+=1
+            threading.Thread(target=realtime_monitoring,daemon=True, args=(self,context,stop_event)).start()
+            self.report({'INFO'},"Real-time monitoring has started")
+
 
         
         return {'FINISHED'}
