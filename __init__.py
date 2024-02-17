@@ -35,16 +35,14 @@ from AAO_OT_Monitoring_Type    import ENUM_PROPS_delay_time
 from AAO_OT_Monitoring_Type    import ENUM_PROPS_monitoring_type
 from AAO_OT_Onclick_Organise   import on_start                   #functions
 from AAO_OT_Onclick_Organise   import blender_folder_on_saved
-from AAO_DB_FolderNames        import close_connection
-# from AAO_UT_FileHandler        import memory_connection         #variables
-from AAO_UT_FileHandler        import database_connection
+from AAO_DB_FolderNames        import close_connection         
+from AAO_UT_FileHandler        import database_connection #variables
 
 
 
 def on_exit():
     print("Sab KHatam hogaya")
-    # close_connection(memory_connection)
-    # close_connection(database_connection)
+    close_connection(database_connection)
      
      
 
