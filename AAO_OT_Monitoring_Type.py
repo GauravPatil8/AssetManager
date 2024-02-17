@@ -4,10 +4,10 @@ import time
 import threading
 from AAO_UT_FileHandler      import organise
 from AAO_OT_Onclick_Organise import is_blend_file_saved
-from AAO_OT_Onclick_Organise import blender_folder
 from AAO_OT_Onclick_Organise import get_downloads_folder
 from AAO_OT_Onclick_Organise import create_folder
 from AAO_OT_Onclick_Organise import local_time_at_start
+from AAO_OT_Onclick_Organise import blender_folder
 
 stop_event = threading.Event()
 def monitoring_type_prop_update_handler(self, context):
@@ -35,17 +35,7 @@ class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
         default='THREE'
     )
 
-
-        
-    
-            
-
-class OBJECT_OT_monitor_type(bpy.types.Operator):
-    bl_label="Start"
-    bl_idname='object.realtimeops'
-    bl_description='Real-time monitoring will start'
-
-    def realtime_monitoring(stop_event,context,self):
+def realtime_monitoring(self,context,stop_event):
         while not stop_event.is_set():
             selected_folder = context.scene.monitor_folder
             temporary_folder = None  # Define temporary_folder outside the if block
@@ -77,12 +67,28 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
             else:
                     print("delay hoga jee 10 sec")
                     time.sleep(10)
+        
+    
+            
+
+class OBJECT_OT_monitor_type(bpy.types.Operator):
+    bl_label="Start"
+    bl_idname='object.realtimeops'
+    bl_description='Real-time monitoring will start'
+
+    
+    
 
     def execute(self, context):
         global stop_event
-        stop_event.clear() 
-        threading.Thread(target=self.realtime_monitoring,daemon=True, args=(stop_event,context,self)).start()
+        stop_event.clear()
+        
+        threading.Thread(target=realtime_monitoring,daemon=True, args=(self,context,stop_event)).start()
+        
+        
         self.report({'INFO'},"Real-time monitoring has started.")
+
+        
         return {'FINISHED'}
 
 
