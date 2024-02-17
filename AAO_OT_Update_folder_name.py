@@ -43,18 +43,18 @@ class ENUM_PROPS_Folder_name(bpy.types.PropertyGroup):
 
 def change_in_system(old_folder_name,index):
     if is_blend_file_saved():
-        for folder in os.listdir(blender_folder):
-                    if folder==old_folder_name:
-                        old_folder_path=os.path.join(blender_folder,old_folder_name)
-                        new_folder_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index))
-                        os.rename(old_folder_path,new_folder_path)
+        if os.path.exists(os.path.join(blender_folder,old_folder_name)):
+                    
+            old_folder_path=os.path.join(blender_folder,old_folder_name)
+            new_folder_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index))
+            os.rename(old_folder_path,new_folder_path)
     else:
         temp_folder=os.path.join(get_downloads_folder(),"Temp")
-        for folder in os.listdir(temp_folder):
-                    if folder==old_folder_name:
-                        old_folder_path=os.path.join(temp_folder,old_folder_name)
-                        new_folder_path=os.path.join(temp_folder,fetch_folder_name(database_connection,index))
-                        os.rename(old_folder_path,new_folder_path)
+        if os.path.exists(os.path.join(temp_folder,old_folder_name)):
+                    
+            old_folder_path=os.path.join(blender_folder,old_folder_name)
+            new_folder_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index))
+            os.rename(old_folder_path,new_folder_path)
     
 
 class OBJECT_OT_update_foldername(bpy.types.Operator):
