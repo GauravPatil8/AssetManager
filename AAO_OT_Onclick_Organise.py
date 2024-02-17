@@ -2,7 +2,7 @@ import sys
 import bpy
 import os
 import time
-
+import threading
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
@@ -53,7 +53,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
         
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
-                organise('0', blender_folder, local_time_at_start)
+                threading.Thread(target=organise,daemon=True,args=('0', blender_folder, local_time_at_start)).start()
 
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), "Temp")
@@ -61,10 +61,12 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
                 print(temporary_folder)
                 print("kaam karra hu")  
                 print("onclick pe time: ",local_time_at_start)
-                organise('0', temporary_folder,local_time_at_start)                
+                threading.Thread(target=organise,daemon=True,args=('0', temporary_folder,local_time_at_start)).start()
+                              
         else:
             if is_blend_file_saved():
-                organise('1', blender_folder, local_time_at_start)
+                threading.Thread(target=organise,daemon=True,args=('1', blender_folder, local_time_at_start)).start()
+                
             else:
                 self.report({'ERROR'},"Blender file has not been saved. Please save your Blender file before utilizing this option.")
                 context.scene.monitor_folder='DOWNLOADS'
