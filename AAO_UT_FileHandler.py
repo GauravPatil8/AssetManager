@@ -4,12 +4,13 @@ import bpy
 import zipfile
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import create_and_populate
-from AAO_DB_FolderNames import changelog_table_in_memory
-from AAO_DB_FolderNames import insert_in_change_log
-
-
+from AAO_OT_Log import file_data
+def log_info(file_name,file_path):
+     info_tuple=file_name+","+file_path
+     log_tuple=tuple(info_tuple.split(','))
+     file_data.append(log_tuple)
+     
 database_connection=create_and_populate()
-memory_connection=changelog_table_in_memory()
 #temporary hai
 images_folder_name=fetch_folder_name(database_connection,1)
 project_folder_name=fetch_folder_name(database_connection,2)
@@ -82,14 +83,15 @@ def organise_zip(zip_file_path,destination_folder,file_name):
 
             
     if flag==True:
-        model_folder = os.path.join(destination_folder, mocap_folder_name)
+        model_folder = os.path.join(destination_folder, model_folder_name)
         create_folder(model_folder)
             
         subdirectory_path=os.path.join(model_folder,subdirectory_name)
         create_folder(subdirectory_path)
         with zipfile.ZipFile(zip_file_path,'r') as zip_ref:
             zip_ref.extractall(subdirectory_path)
-        insert_in_change_log(memory_connection,file_name,model_folder)
+        log_info(file_name,model_folder)
+        
                         
     else:
                         
@@ -100,7 +102,8 @@ def organise_zip(zip_file_path,destination_folder,file_name):
         create_folder(subdirectory_path)
         with zipfile.ZipFile(zip_file_path,'r') as zip_ref:
             zip_ref.extractall(subdirectory_path)
-        insert_in_change_log(memory_connection,file_name,images_folder)
+        log_info(file_name,images_folder)
+        
                
 
 def create_folder(folder_path):
@@ -119,28 +122,30 @@ def organiser_utility(destination_folder,extension,file_path,file):
                     images_folder_path=os.path.join(destination_folder,images_folder_name)
                     create_folder(images_folder_path)
                     shutil.move(file_path,images_folder_path)
-                    insert_in_change_log(memory_connection,file,images_folder_path)
-
+                    log_info(file,images_folder_path)
     elif extension in project_files:
 
                     project_folder_path=os.path.join(destination_folder,project_folder_name)
                     create_folder(project_folder_path)
                     shutil.move(file_path,project_folder_path)
-                    insert_in_change_log(memory_connection,file,project_folder_path)
+                    log_info(file,project_folder_path)
+                    
 
     elif extension in model_files:
 
                     model_folder_path=os.path.join(destination_folder,model_folder_name)
                     create_folder(model_folder_path)
                     shutil.move(file_path,model_folder_path)
-                    insert_in_change_log(memory_connection,file,model_folder_path)
+                    log_info(file,model_folder_path)
+                    
                         
     elif extension in mocap_files:
 
                     mocap_folder_path=os.path.join(destination_folder,mocap_folder_name)
                     create_folder(mocap_folder_path)
                     shutil.move(file_path,mocap_folder_path)
-                    insert_in_change_log(memory_connection,file,mocap_folder_path)
+                    log_info(file,mocap_folder_path)
+                    
 
     elif extension =='zip':
         organise_zip(file_path,destination_folder,file)
@@ -152,13 +157,15 @@ def organiser_utility(destination_folder,extension,file_path,file):
         hdri_folder_path=os.path.join(destination_folder,images_folder_name,"HDRI_Images")
         create_folder(hdri_folder_path)
         shutil.move(file_path,hdri_folder_path)
-        insert_in_change_log(memory_connection,file,hdri_folder_path)
+        log_info(file,hdri_folder_path)
+        
 
     elif extension in material_files:
         material_folder_path=os.path.join(destination_folder,project_folder_name,"Materials") #project files ke jagah db name daal diyo
         create_folder(material_folder_path)
         shutil.move(file_path,material_folder_path)
-        insert_in_change_log(memory_connection,file,material_folder_path)
+        log_info(file,material_folder_path)
+        
 
 
 def get_blendfile_folder():
@@ -170,9 +177,7 @@ def get_blendfile_folder():
     
 
 def organise(source_folder_flag,destination_folder,localtime_at_Start):
-    print ("organise function tak poch gaya")#destination_folder,localtime_atStart):
-    # src_folder=R"c:\Users\GAURAV\Downloads\test_folder"
-    # destination_folder=R"c:\Users\GAURAV\Downloads\Temp"
+    print ("organise function tak poch gaya")
     for file in os.listdir(get_source_folder(source_folder_flag)):
         # print(file)                         
         file_path=os.path.join(get_source_folder(source_folder_flag),file)
