@@ -24,6 +24,7 @@ def on_start(dummy):
 
 
 def blender_folder_on_saved(dummy):
+    
     global save_count
     if save_count==0:
         global blender_folder
