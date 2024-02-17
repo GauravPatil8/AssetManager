@@ -1,8 +1,6 @@
 import bpy
-from AAO_DB_FolderNames import get_file_info_change_log
-from AAO_UT_FileHandler import memory_connection
 
-
+file_data = []
 
 class OBJECT_OT_log(bpy.types.Operator):
     bl_idname = "object.log"
@@ -22,10 +20,8 @@ class OBJECT_OT_log_popup(bpy.types.Menu):
     def draw(self, context):
         layout = self.layout
 
-        file_data = []
-        file_info=get_file_info_change_log(memory_connection)
-        for row in file_info:
-            file_data.append(row)
+        
+       
         if file_data != []:
             for option, description in list(reversed(file_data)):
                 
