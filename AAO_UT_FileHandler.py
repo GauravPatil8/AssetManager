@@ -30,8 +30,8 @@ material_files  = ['sbsar','spsm','spp','sbs']
 
 
 def log_info(file_name,file_path):
-     info_tuple=file_name+","+file_path
-     log_tuple=tuple(info_tuple.split(','))
+     info_list=[file_name,file_path]
+     log_tuple=tuple(info_list)
      file_data.append(log_tuple)
 
 def is_blend_file_saved():
@@ -45,7 +45,7 @@ def get_source_folder(flag):
         return get_downloads_folder()
     else:
         if get_blendfile_folder()==None:
-            print("save toh karle")
+            pass
         else:
             return get_blendfile_folder()
      
@@ -180,9 +180,9 @@ def get_blendfile_folder():
     
 
 def organise(source_folder_flag,destination_folder,localtime_at_Start):
-    print ("organise function tak poch gaya")
+    
     for file in os.listdir(get_source_folder(source_folder_flag)):
-        # print(file)                         
+                              
         file_path=os.path.join(get_source_folder(source_folder_flag),file)
 
         if os.path.getmtime(file_path)>=localtime_at_Start: # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
