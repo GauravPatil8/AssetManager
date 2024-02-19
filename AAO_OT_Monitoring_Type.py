@@ -52,8 +52,6 @@ def realtime_monitoring(self,context,stop_event):
                     temporary_folder = os.path.join(get_downloads_folder(), "Temp")
                     create_folder(temporary_folder)
                     print(temporary_folder)
-                    print("kaam karra hu")  
-                    print("realtime pe time: ",local_time_at_start)
                     organise('0', temporary_folder,local_time_at_start)                
             else:
                 if is_blend_file_saved():
@@ -62,13 +60,10 @@ def realtime_monitoring(self,context,stop_event):
                     context.scene.monitor_folder='DOWNLOADS'    
                 
             if context.scene.delay_time_prop == 'THREE':
-                    print("delay hoga jee 3 sec")
                     time.sleep(3)
-            elif context.scene.delay_time_prop == 'SEVEN':
-                    print("delay hoga jee 7 sec")
+            elif context.scene.delay_time_prop == 'SEVEN': 
                     time.sleep(7)
             else:
-                    print("delay hoga jee 10 sec")
                     time.sleep(10)
         
     
