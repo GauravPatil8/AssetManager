@@ -20,7 +20,7 @@ local_time_at_start=None
 def on_start(dummy):
     global local_time_at_start
     local_time_at_start=time.time()
-    print("on start time: ",local_time_at_start)
+
 
 
 def blender_folder_on_saved(dummy):
@@ -59,8 +59,6 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
                 temporary_folder = os.path.join(get_downloads_folder(), "Temp")
                 create_folder(temporary_folder)
                 print(temporary_folder)
-                print("kaam karra hu")  
-                print("onclick pe time: ",local_time_at_start)
                 threading.Thread(target=organise,daemon=True,args=('0', temporary_folder,local_time_at_start)).start()
                               
         else:
