@@ -1,6 +1,5 @@
 import bpy
 import os
-from AAO_DB_FolderNames import create_and_populate
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import update_folder_name
 from AAO_OT_Onclick_Organise import blender_folder
