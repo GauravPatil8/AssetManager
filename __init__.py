@@ -41,7 +41,6 @@ from AAO_UT_FileHandler        import database_connection #variables
 
 
 def on_exit():
-    print("Sab KHatam hogaya")
     close_connection(database_connection)
      
      
