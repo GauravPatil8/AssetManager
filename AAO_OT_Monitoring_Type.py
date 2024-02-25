@@ -5,9 +5,16 @@ import threading
 from AAO_UT_FileHandler      import organise
 from AAO_OT_Onclick_Organise import is_blend_file_saved
 from AAO_OT_Onclick_Organise import get_downloads_folder
+from AAO_OT_Onclick_Organise import get_blendfile_folder
 from AAO_OT_Onclick_Organise import create_folder
 from AAO_OT_Onclick_Organise import local_time_at_start
-from AAO_OT_Onclick_Organise import blender_folder
+blender_folder=None
+def get_blender_folder_path():
+    global blender_folder
+    old_blender_folder=get_blendfile_folder()
+    if old_blender_folder:
+        one_blender_folder=os.path.dirname(old_blender_folder)
+        blender_folder=os.path.dirname(one_blender_folder)
 
 stop_event = threading.Event()
 threads_counter=0
@@ -46,15 +53,17 @@ def realtime_monitoring(self,context,stop_event):
             
             if selected_folder == 'DOWNLOADS':
                 if is_blend_file_saved():
+                    get_blender_folder_path()
+                    print(blender_folder)
                     organise('0', blender_folder, local_time_at_start)
 
                 else:
                     temporary_folder = os.path.join(get_downloads_folder(), "Temp")
                     create_folder(temporary_folder)
-                    print(temporary_folder)
                     organise('0', temporary_folder,local_time_at_start)                
             else:
                 if is_blend_file_saved():
+                    get_blender_folder_path()
                     organise('1', blender_folder, local_time_at_start)
                 else:
                     context.scene.monitor_folder='DOWNLOADS'    
@@ -74,8 +83,6 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
     bl_idname='object.realtimeops'
     bl_description='Real-time monitoring will start'
 
-    def display_info(self,context):
-        self.report({'ERROR'},"Blender file has not been saved. Please save your Blender file before utilizing this option.")
     
 
     def execute(self, context):
