@@ -2,6 +2,7 @@ import os
 import shutil
 import bpy
 import zipfile
+import sys
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import create_and_populate
 from AAO_OT_Log import file_data
