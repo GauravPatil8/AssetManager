@@ -2,8 +2,16 @@ import bpy
 import os
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import update_folder_name
-from AAO_OT_Onclick_Organise import blender_folder
 from AAO_UT_FileHandler import database_connection
+from AAO_UT_FileHandler import get_blendfile_folder
+
+blender_folder=None
+def get_blender_folder_path():
+    global blender_folder
+    old_blender_folder=get_blendfile_folder()
+    if old_blender_folder:
+        one_blender_folder=os.path.dirname(old_blender_folder)
+        blender_folder=os.path.dirname(one_blender_folder)
 
 def get_downloads_folder():
     home_directory=os.path.expanduser('~')
@@ -41,18 +49,30 @@ class ENUM_PROPS_Folder_name(bpy.types.PropertyGroup):
 
 
 def change_in_system(old_folder_name,index):
+    get_blender_folder_path()
     if is_blend_file_saved():
         if os.path.exists(os.path.join(blender_folder,old_folder_name)):
-                    
+            print(blender_folder)       
             old_folder_path=os.path.join(blender_folder,old_folder_name)
             new_folder_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index))
-            os.rename(old_folder_path,new_folder_path)
+            
+            if index==2:
+                bpy.ops.wm.save_mainfile()
+                old_file_path=bpy.data.filepath
+                file_name=os.path.basename(old_file_path)
+                new_file_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index),file_name)
+                bpy.ops.wm.open_mainfile(filepath=old_file_path)
+                os.rename(old_folder_path,new_folder_path)
+                bpy.ops.wm.save_mainfile(filepath=new_file_path)
+            else:
+                os.rename(old_folder_path,new_folder_path)
+
     else:
         temp_folder=os.path.join(get_downloads_folder(),"Temp")
         if os.path.exists(os.path.join(temp_folder,old_folder_name)):
                     
-            old_folder_path=os.path.join(blender_folder,old_folder_name)
-            new_folder_path=os.path.join(blender_folder,fetch_folder_name(database_connection,index))
+            old_folder_path=os.path.join(get_downloads_folder(),"Temp",old_folder_name)
+            new_folder_path=os.path.join(get_downloads_folder(),"Temp",fetch_folder_name(database_connection,index))
             os.rename(old_folder_path,new_folder_path)
     
 
