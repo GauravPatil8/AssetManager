@@ -23,14 +23,14 @@ def is_blend_file_saved():
     else:
         return True
     
-class ENUM_PROPS_custom_folder_name(bpy.types.PropertyGroup):   
+class STRING_PROPS_custom_folder_name(bpy.types.PropertyGroup):   
     bpy.types.Scene.custom_folder_name = bpy.props.StringProperty(
         name="Enter Folder Name",
         description="Enter a custom folder name",
         default="",
     )
 
-class ENUM_PROPS_Change_folder_name(bpy.types.PropertyGroup):
+class Bool_PROPS_Change_folder_name(bpy.types.PropertyGroup):
     bpy.types.Scene.change_folder_name = bpy.props.BoolProperty(
             name="Change Folder Name",
             description="Enable Changing Folder Name",

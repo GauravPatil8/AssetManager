@@ -8,15 +8,34 @@ from AAO_DB_FolderNames import create_and_populate
 from AAO_OT_Log import file_data
 
 filecount=0
-database_connection=create_and_populate()
+
+def get_package_path():
+    script_path = os.path.abspath(__file__)
+    return os.path.dirname(script_path)
+
+package_path=get_package_path()
+file_folder_path=os.path.join(package_path,"Presets")
+if not os.path.exists(file_folder_path):
+    os.mkdir(file_folder_path)
+file_path=os.path.join(file_folder_path,"Default.db")
+
+database_connection=create_and_populate(file_path)
 #temporary hai
 images_folder_name=fetch_folder_name(database_connection,1)
 project_folder_name=fetch_folder_name(database_connection,2)
 model_folder_name=fetch_folder_name(database_connection,3)
 mocap_folder_name=fetch_folder_name(database_connection,4)
+material_folder_name=fetch_folder_name(database_connection,5)
+video_folder_name=fetch_folder_name(database_connection,6)
+audio_folder_name=fetch_folder_name(database_connection,7)
 
-
-
+# ('1',"Textures"),
+# ('2',"Project_Files"),
+# ('3',"Models"),
+# ('4',"Mocap_data")
+# ('5',"Material_files")
+# ('6',"Video_files")
+# ('7',"Audio_files")
 # execute everytime at the beginning code (GLOBALLY DECLARED):
 
 project_files   = ['max','3ds','blend','c4d','bgeo','geo']
@@ -28,6 +47,10 @@ image_files     = ['png','jpg','jpeg','exr','tiff','webp','gif','psd','indd','ra
 mocap_files     = ['bvh']
 
 material_files  = ['sbsar','spsm','spp','sbs']
+
+video_files     = ['mov','mp4','mkv','avi','wmv','avchd','webm','flv']
+
+audio_files     = ['wav','mp3','flac','ogg','m3u','acc','wma','wav','midi','aif','m4a','mpa','pls']
 
 
 def log_info(file_name,file_path):
@@ -51,7 +74,24 @@ def get_source_folder(flag):
         newpath_2=os.path.dirname(newpath_1)
         return newpath_2
      
-     
+def reload_image_textures():
+    for material in bpy.data.materials:
+        if material.node_tree:
+            for node in material.node_tree.nodes:
+                if node.type == 'TEX_IMAGE':
+                    image_texture = node.image
+                    if image_texture:
+                        # Check if the image has a filepath
+                        if image_texture.filepath:
+                            # Change the path to the new one
+                            new_filepath = R"C:\Users\GAURAV\Downloads\Temp\HERO_01_new.png"  # Change the path here
+                            image_texture.filepath = bpy.path.abspath(new_filepath)
+                            # Reload the image
+                            image_texture.reload()
+                            # Notify the user
+                            print("Image texture reloaded for material:", material.name)
+        else:
+            print("Material", material.name, "does not have a node tree.")   
 
 def organise_zip(zip_file_path,destination_folder,file_name):
 
@@ -108,13 +148,10 @@ def organise_zip(zip_file_path,destination_folder,file_name):
         with zipfile.ZipFile(zip_file_path,'r') as zip_ref:
             zip_ref.extractall(subdirectory_path)
         log_info(file_name,images_folder)
-        
-               
 
 def create_folder(folder_path):
-    os.makedirs(folder_path,exist_ok=True)
-
-
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
 def get_downloads_folder():
     
@@ -139,42 +176,34 @@ def duplicate_handler(file_path,file,folder_path,extension):
     filecount+=1
 
 def organiser_utility(destination_folder,extension,file_path,file):
+
     if extension in image_files:
+        images_folder_path=os.path.join(destination_folder,images_folder_name)
+        create_folder(images_folder_path)
+        duplicate_handler(file_path,file,images_folder_path,extension)
+        log_info(file,images_folder_path)
                     
-                    images_folder_path=os.path.join(destination_folder,images_folder_name)
-                    create_folder(images_folder_path)
-                    duplicate_handler(file_path,file,images_folder_path,extension)
-                    log_info(file,images_folder_path)
-                    
-    elif extension in project_files:
-                    
-                    project_folder_path=os.path.join(destination_folder,project_folder_name)
-                    create_folder(project_folder_path)
-                    duplicate_handler(file_path,file,project_folder_path,extension)
-                    log_info(file,project_folder_path)
-                    
-
+    elif extension in project_files:          
+        project_folder_path=os.path.join(destination_folder,project_folder_name)
+        create_folder(project_folder_path)
+        duplicate_handler(file_path,file,project_folder_path,extension)
+        log_info(file,project_folder_path)
+ 
     elif extension in model_files:
-
-                    model_folder_path=os.path.join(destination_folder,model_folder_name)
-                    create_folder(model_folder_path)
-                    duplicate_handler(file_path,file,mocap_folder_path,extension)
-                    log_info(file,model_folder_path)
-                    
-                        
+        model_folder_path=os.path.join(destination_folder,model_folder_name)
+        create_folder(model_folder_path)
+        duplicate_handler(file_path,file,mocap_folder_path,extension)
+        log_info(file,model_folder_path)
+               
     elif extension in mocap_files:
-
-                    mocap_folder_path=os.path.join(destination_folder,mocap_folder_name)
-                    create_folder(mocap_folder_path)
-                    duplicate_handler(file_path,file,mocap_folder_path,extension)
-                    log_info(file,mocap_folder_path)
-                    
-
+        mocap_folder_path=os.path.join(destination_folder,mocap_folder_name)
+        create_folder(mocap_folder_path)
+        duplicate_handler(file_path,file,mocap_folder_path,extension)
+        log_info(file,mocap_folder_path)
+ 
     elif extension =='zip':
         organise_zip(file_path,destination_folder,file)
         os.remove(file_path)
-        
-
 
     elif extension =='hdr':
         hdri_folder_path=os.path.join(destination_folder,images_folder_name,"HDRI_Images")
@@ -184,10 +213,22 @@ def organiser_utility(destination_folder,extension,file_path,file):
         
 
     elif extension in material_files:
-        material_folder_path=os.path.join(destination_folder,project_folder_name,"Materials") #project files ke jagah db name daal diyo
+        material_folder_path=os.path.join(destination_folder,project_folder_name,material_folder_name) 
         create_folder(material_folder_path)
         duplicate_handler(file_path,file,material_folder_path,extension)
         log_info(file,material_folder_path)
+
+    elif extension in video_files:
+        video_folder_path=os.path.join(destination_folder,project_folder_name,video_folder_name) 
+        create_folder(video_folder_path)
+        duplicate_handler(file_path,file,video_folder_path,extension)
+        log_info(file,video_folder_path)
+
+    elif extension in video_files:
+        audio_folder_path=os.path.join(destination_folder,project_folder_name,audio_folder_name) 
+        create_folder(audio_folder_path)
+        duplicate_handler(file_path,file,audio_folder_path,extension)
+        log_info(file,audio_folder_path)
         
 
 
@@ -202,8 +243,7 @@ def get_blendfile_folder():
 def organise(source_folder_flag,destination_folder,localtime_at_Start):
     
     for file in os.listdir(get_source_folder(source_folder_flag)):
-           
-              
+   
         file_path=os.path.join(get_source_folder(source_folder_flag),file)
         if os.path.isfile(file_path): 
             

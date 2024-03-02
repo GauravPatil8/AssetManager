@@ -23,12 +23,12 @@ class OBJECT_OT_log_popup(bpy.types.Menu):
         
        
         if file_data != []:
-            for option, description in list(reversed(file_data)):
+            for file_name, file_path in list(reversed(file_data)):
                 
-                layout.label(text=option,icon='FILE')
-                layout.label(text=description,icon='FOLDER_REDIRECT')
+                layout.label(text=file_name,icon='FILE')
+                layout.label(text=file_path,icon='FOLDER_REDIRECT')
                 layout.separator()
         else:
-            layout.label(text="No file modifications have been detected.",icon='INFO')
+            layout.label(text="No file movement have been detected.",icon='INFO')
 
 

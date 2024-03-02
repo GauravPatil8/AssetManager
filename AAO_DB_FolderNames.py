@@ -3,8 +3,8 @@ import sqlite3
 def close_connection(connection):
     connection.close()
 
-def create_and_populate():
-    conn=sqlite3.connect("foldername_database.db")
+def create_and_populate(file_path):
+    conn=sqlite3.connect(file_path)
     cursor=conn.cursor()
     
     cursor.execute("""
@@ -21,7 +21,10 @@ def create_and_populate():
         ('1',"Textures"),
         ('2',"Project_Files"),
         ('3',"Models"),
-        ('4',"Mocap_data")
+        ('4',"Mocap_data"),
+        ('5',"Material_files"),
+        ('6',"Video_files"),
+        ('7',"Audio_files")
                         
     """)
     conn.commit()
