@@ -12,8 +12,6 @@ selected_folder_path = None
 preset_list=[('DEFAULT','Default','Stores downloaded files in a simple folder structure based on their type'),]
 package_path=get_package_path()
 subdirectory=[]
-
-
 target_folder=os.path.join(package_path,"Presets")
 
 def reload_panel():
