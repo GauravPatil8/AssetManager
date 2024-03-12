@@ -16,6 +16,19 @@ subdirectory=[]
 
 target_folder=os.path.join(package_path,"Presets")
 
+def reload_panel():
+    bpy.utils.unregister_class(OBJECT_PT_preset_creator)
+    bpy.utils.register_class(OBJECT_PT_preset_creator)
+
+
+def duplicate_tags_checker(context):
+    seen=set()
+    for tag in context.scene.enum_properties:
+        if tag.value!='NONE' and tag.value  in seen:
+            return True
+        seen.add(tag.value)
+    return False
+
 def generator_list(self,context):
         global preset_list
         preset_list[1:]=[]
@@ -122,6 +135,7 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
             new_enum_property = context.scene.enum_properties.add()
             new_enum_property.name = sub_dir
             new_enum_property.value = "NONE"   
+        reload_panel()
         return {'FINISHED'}
 
     def invoke(self, context, event):
@@ -153,27 +167,31 @@ class OBJECT_OT_save_preset(bpy.types.Operator):
         global subdirectories_relpath_dict
         global json_data
         if context.scene.preset_name!='':
-            subdir_keys=list(subdirectories_relpath_dict.keys())
-
-            for i,enum_property in enumerate(context.scene.enum_properties):
-                if enum_property.name!=subdir_keys[i]:
-                    path=subdirectories_relpath_dict[subdir_keys[i]]
-                    base_dir=os.path.dirname(path)
-                    final_path=os.path.join(base_dir,enum_property.name)
-                    json_data[enum_property.value]=final_path
-                else:
-                    path=subdirectories_relpath_dict[subdir_keys[i]]
-                    json_data[enum_property.value]=path
             
-                json_preset_path=os.path.join(package_path,'Presets',context.scene.preset_name+'.json')
-                with open(json_preset_path,'w') as json_file:
-                    json.dump(json_data,json_file,indent=4)
-            self.report({'INFO'},f'{context.scene.preset_name} preset saved')
-            subdirectory.clear()
-            subdirectories_relpath_dict.clear()
-            json_data.clear()
-            context.scene.preset_name=''
-            context.scene.preset_analysis_folder=''
+            if not duplicate_tags_checker(context):
+                subdir_keys=list(subdirectories_relpath_dict.keys())
+
+                for i,enum_property in enumerate(context.scene.enum_properties):
+                    if enum_property.name!=subdir_keys[i]:
+                        path=subdirectories_relpath_dict[subdir_keys[i]]
+                        base_dir=os.path.dirname(path)
+                        final_path=os.path.join(base_dir,enum_property.name)
+                        json_data[enum_property.value]=final_path
+                    else:
+                        path=subdirectories_relpath_dict[subdir_keys[i]]
+                        json_data[enum_property.value]=path
+                
+                    json_preset_path=os.path.join(package_path,'Presets',context.scene.preset_name+'.json')
+                    with open(json_preset_path,'w') as json_file:
+                        json.dump(json_data,json_file,indent=4)
+                self.report({'INFO'},f'{context.scene.preset_name} preset saved')
+                subdirectory.clear()
+                subdirectories_relpath_dict.clear()
+                json_data.clear()
+                context.scene.preset_name=''
+                context.scene.preset_analysis_folder=''
+            else:
+                self.report({'ERROR'},'Select distinct tags for each directory')
 
         else:
             self.report({'ERROR'},"Please name your preset")
