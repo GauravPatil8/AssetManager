@@ -15,6 +15,8 @@ from AAO_UT_FileHandler import create_folder
 from AAO_UT_FileHandler import get_blendfile_folder
 from AAO_UT_FileHandler import project_folder_name
 
+
+
 blender_folder=None
 save_count=0
 local_time_at_start=None
@@ -22,6 +24,7 @@ local_time_at_start=None
 def on_start(dummy):
     global local_time_at_start
     local_time_at_start=time.time()
+    
 
 
 
