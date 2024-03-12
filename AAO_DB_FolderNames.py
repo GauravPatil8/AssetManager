@@ -1,12 +1,15 @@
-#DEFAULT DATABASE
+# DEFAULT DATABASE
 import sqlite3
+
+
 def close_connection(connection):
     connection.close()
 
+
 def create_and_populate(file_path):
-    conn=sqlite3.connect(file_path)
-    cursor=conn.cursor()
-    
+    conn = sqlite3.connect(file_path)
+    cursor = conn.cursor()
+
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS Folder_Name(
                 id INTEGER PRIMARY KEY UNIQUE,
@@ -14,7 +17,7 @@ def create_and_populate(file_path):
         )
     """)
 
-    cursor.execute ("""
+    cursor.execute("""
         INSERT OR IGNORE INTO Folder_Name 
         (id,folder_name) 
         VALUES
@@ -29,21 +32,21 @@ def create_and_populate(file_path):
     conn.commit()
     cursor.close()
     return conn
-    
 
 
-def fetch_folder_name(connection,idx):
-    cursor=connection.cursor()
-    cursor.execute("SELECT folder_name FROM Folder_name where id=?",(idx,))
-    folder_name=cursor.fetchone()
+def fetch_folder_name(connection, idx):
+    cursor = connection.cursor()
+    cursor.execute("SELECT folder_name FROM Folder_name where id=?", (idx,))
+    folder_name = cursor.fetchone()
     cursor.close()
     return folder_name[0]
 
-def update_folder_name(connection,idx,folder_name):
-    cursor=connection.cursor()
-    cursor.execute("UPDATE Folder_name SET folder_name=? where id=?",(folder_name,idx))
+
+def update_folder_name(connection, idx, folder_name):
+    cursor = connection.cursor()
+    cursor.execute(
+        "UPDATE Folder_name SET folder_name=? where id=?", (folder_name, idx))
     connection.commit()
     cursor.close()
 
-#END OF DEFAULT DATABASE
-
+# END OF DEFAULT DATABASE
