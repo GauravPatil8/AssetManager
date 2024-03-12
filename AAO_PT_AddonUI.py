@@ -17,7 +17,9 @@ class OBJECT_PT_AssetManagerUI(bpy.types.Panel):
         # layout.separator()
         
         layout.label(text="Folder presets:")
-        layout.prop(scene,"folder_presets",text='')
+        row_preset=layout.row()
+        row_preset.prop(scene,"folder_presets",text='')
+        row_preset.operator('ot.updateenum',text='',icon='FILE_REFRESH')
         
 
         layout.separator()
