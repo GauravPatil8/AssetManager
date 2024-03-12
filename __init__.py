@@ -12,7 +12,13 @@
 #     "support": "COMMUNITY",
 # }
 
-
+import sys
+import bpy
+import os
+import atexit
+script_path = os.path.abspath(__file__)
+package_path = os.path.dirname(script_path)
+sys.path.append(package_path)
 from AAO_UT_FileHandler import database_connection  # variables
 from AAO_DB_FolderNames import close_connection
 from AAO_OT_Onclick_Organise import on_start  # functions
@@ -36,13 +42,7 @@ from AAO_OT_Update_folder_name import ENUM_PROPS_Folder_name
 from AAO_OT_Update_folder_name import Bool_PROPS_Change_folder_name
 from AAO_OT_Update_folder_name import OBJECT_OT_update_foldername
 from AAO_OT_Onclick_Organise import ENUM_PROPS_monitor_folder
-import sys
-import bpy
-import os
-import atexit
-script_path = os.path.abspath(__file__)
-package_path = os.path.dirname(script_path)
-sys.path.append(package_path)
+
 
 
 def on_exit():
