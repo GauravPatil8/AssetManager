@@ -24,8 +24,7 @@ def create_and_populate(file_path):
         ('4',"Mocap_data"),
         ('5',"Material_files"),
         ('6',"Video_files"),
-        ('7',"Audio_files")
-                        
+        ('7',"Audio_files")                    
     """)
     conn.commit()
     cursor.close()
