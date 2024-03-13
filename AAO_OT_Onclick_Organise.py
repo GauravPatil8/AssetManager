@@ -7,7 +7,6 @@ import sys
 import bpy
 import os
 import time
-import shutil
 import threading
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
@@ -16,8 +15,16 @@ sys.path.append(package_path)
 
 blender_folder = None
 
+
 local_time_at_start = None
 
+###ye function ko improve karna bhai######
+def get_blender_folder_path():
+    global blender_folder
+    old_blender_folder = get_blendfile_folder()
+    if old_blender_folder:
+        one_blender_folder = os.path.dirname(old_blender_folder)
+        blender_folder = os.path.dirname(one_blender_folder)
 
 def on_start(dummy):
     global local_time_at_start

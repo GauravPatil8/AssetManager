@@ -19,7 +19,7 @@ from AAO_OT_Log import file_data
 
 blender_folder=''
 filecount = 0
-save_count = 0
+save_flag = False
 
 def get_package_path():
     script_path = os.path.abspath(__file__)
@@ -34,13 +34,13 @@ file_path = os.path.join(file_folder_path, "Default.db")
 
 database_connection = create_and_populate(file_path)
 # temporary hai
-images_folder_destination =''
-project_folder_destination = ''
-model_folder_destination = ''
-mocap_folder_destination = ''
-material_folder_destination =''
-video_folder_destination = ''
-audio_folder_destination = ''
+images_folder_destination = fetch_folder_name(database_connection, 1)
+project_folder_destination = fetch_folder_name(database_connection, 2)
+model_folder_destination = fetch_folder_name(database_connection, 3)
+mocap_folder_destination = fetch_folder_name(database_connection, 4)
+material_folder_destination = fetch_folder_name(database_connection, 5)
+video_folder_destination = fetch_folder_name(database_connection, 6)
+audio_folder_destination = fetch_folder_name(database_connection, 7)
 
 
 project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo']
@@ -79,22 +79,13 @@ def path_constructor():
 
 
     scene = bpy.context.scene
-    if scene.folder_presets=='DEFAULT':
-        images_folder_destination = fetch_folder_name(database_connection, 1)
-        project_folder_destination = fetch_folder_name(database_connection, 2)
-        model_folder_destination = fetch_folder_name(database_connection, 3)
-        mocap_folder_destination = fetch_folder_name(database_connection, 4)
-        material_folder_destination = fetch_folder_name(database_connection, 5)
-        video_folder_destination = fetch_folder_name(database_connection, 6)
-        audio_folder_destination = fetch_folder_name(database_connection, 7)
-
-    else:
-
+    if scene.folder_presets!='DEFAULT':
+        print("in path construct")
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
             f_names=json.load(f)
         
-        images_folder_destination =f_names.get('IMAGE',fetch_folder_name(database_connection, 1))
+        images_folder_destination = f_names.get('IMAGE',fetch_folder_name(database_connection, 1))
         project_folder_destination = f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
         model_folder_destination = f_names.get('MODEL',fetch_folder_name(database_connection, 3))
         mocap_folder_destination = f_names.get('MOCAP',fetch_folder_name(database_connection, 4))
@@ -104,10 +95,10 @@ def path_constructor():
 
         
 def blender_folder_on_saved(dummy):
-    global save_count
+    global save_flag
     global blender_folder
     blender_folder = get_blendfile_folder()
-    if save_count == 0:
+    if save_flag == False:
 
         blender_folder = get_blendfile_folder()
 
@@ -129,7 +120,7 @@ def blender_folder_on_saved(dummy):
                 shutil.move(os.path.join(get_downloads_folder(),
                             "Temp", folder), blender_folder)
 
-    save_count += 1
+    save_flag =True
 
 
 def log_info(file_name, file_path):
