@@ -4,7 +4,7 @@ import json
 from bpy.types import Context, Operator
 from bpy.props import StringProperty
 from AAO_UT_FileHandler import get_package_path
-
+from AAO_UT_FileHandler import path_constructor
 
 subdirectories_relpath_dict = {}
 json_data = {}
@@ -15,6 +15,10 @@ package_path = get_package_path()
 subdirectory = []
 target_folder = os.path.join(package_path, "Presets")
 
+
+def update_folder_path(self,context):
+    if context.scene.folder_presets!='DEFAULT':
+        path_constructor()
 
 def reload_panel():
     bpy.utils.unregister_class(OBJECT_PT_preset_creator)
@@ -101,6 +105,7 @@ class STRING_PROPS_preset_name(bpy.types.PropertyGroup):
         name="Enter Preset Name",
         description="Enter Preset name",
         default="",
+       
     )
 
 
@@ -159,6 +164,7 @@ class ENUM_PROPS_folder_presets(bpy.types.PropertyGroup):
         items=preset_list,
         description="Select a folder structure",
         default='DEFAULT',
+        update=update_folder_path
     )
 
 

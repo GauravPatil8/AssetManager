@@ -1,4 +1,3 @@
-from AAO_UT_FileHandler import project_folder_name
 from AAO_UT_FileHandler import get_blendfile_folder
 from AAO_UT_FileHandler import create_folder
 from AAO_UT_FileHandler import get_downloads_folder
@@ -16,7 +15,7 @@ sys.path.append(package_path)
 
 
 blender_folder = None
-save_count = 0
+
 local_time_at_start = None
 
 
@@ -25,33 +24,7 @@ def on_start(dummy):
     local_time_at_start = time.time()
 
 
-def blender_folder_on_saved(dummy):
-    global save_count
-    global blender_folder
-    blender_folder = get_blendfile_folder()
-    if save_count == 0:
 
-        blender_folder = get_blendfile_folder()
-
-        os.makedirs(os.path.join(blender_folder,
-                    project_folder_name), exist_ok=True)
-        new_blender_folder = os.path.join(blender_folder, project_folder_name)
-
-        old_file_path = bpy.data.filepath
-        bpy.ops.wm.open_mainfile(filepath=old_file_path)
-
-        shutil.move(bpy.data.filepath, new_blender_folder)
-
-        new_file_path = os.path.join(
-            blender_folder, project_folder_name, os.path.basename(old_file_path))
-        bpy.ops.wm.save_mainfile(filepath=new_file_path)
-
-        if os.path.exists(os.path.join(get_downloads_folder(), "Temp")):
-            for folder in os.listdir(os.path.join(get_downloads_folder(), "Temp")):
-                shutil.move(os.path.join(get_downloads_folder(),
-                            "Temp", folder), blender_folder)
-
-    save_count += 1
 
 
 class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):

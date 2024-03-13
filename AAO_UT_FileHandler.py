@@ -1,14 +1,25 @@
+# ('1',"Textures"),
+# ('2',"Project_Files"),
+# ('3',"Models"),
+# ('4',"Mocap_data")
+# ('5',"Material_files")
+# ('6',"Video_files")
+# ('7',"Audio_files")
+
 import os
 import shutil
 import bpy
 import zipfile
+import json
 import sys
 from AAO_DB_FolderNames import fetch_folder_name
 from AAO_DB_FolderNames import create_and_populate
 from AAO_OT_Log import file_data
 
-filecount = 0
 
+blender_folder=''
+filecount = 0
+save_count = 0
 
 def get_package_path():
     script_path = os.path.abspath(__file__)
@@ -23,22 +34,14 @@ file_path = os.path.join(file_folder_path, "Default.db")
 
 database_connection = create_and_populate(file_path)
 # temporary hai
-images_folder_name = fetch_folder_name(database_connection, 1)
-project_folder_name = fetch_folder_name(database_connection, 2)
-model_folder_name = fetch_folder_name(database_connection, 3)
-mocap_folder_name = fetch_folder_name(database_connection, 4)
-material_folder_name = fetch_folder_name(database_connection, 5)
-video_folder_name = fetch_folder_name(database_connection, 6)
-audio_folder_name = fetch_folder_name(database_connection, 7)
+images_folder_destination =''
+project_folder_destination = ''
+model_folder_destination = ''
+mocap_folder_destination = ''
+material_folder_destination =''
+video_folder_destination = ''
+audio_folder_destination = ''
 
-# ('1',"Textures"),
-# ('2',"Project_Files"),
-# ('3',"Models"),
-# ('4',"Mocap_data")
-# ('5',"Material_files")
-# ('6',"Video_files")
-# ('7',"Audio_files")
-# execute everytime at the beginning code (GLOBALLY DECLARED):
 
 project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo']
 
@@ -56,6 +59,77 @@ video_files = ['mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', 'flv']
 
 audio_files = ['wav', 'mp3', 'flac', 'ogg', 'm3u', 'acc',
                'wma', 'wav', 'midi', 'aif', 'm4a', 'mpa', 'pls']
+
+
+def get_blendfile_folder():
+    bfp = bpy.data.filepath
+    if bfp:
+        return bpy.path.abspath("//")
+    else:
+        return None
+
+def path_constructor():
+    global images_folder_destination 
+    global project_folder_destination 
+    global model_folder_destination 
+    global mocap_folder_destination 
+    global material_folder_destination 
+    global video_folder_destination 
+    global audio_folder_destination 
+
+
+    scene = bpy.context.scene
+    if scene.folder_presets=='DEFAULT':
+        images_folder_destination = fetch_folder_name(database_connection, 1)
+        project_folder_destination = fetch_folder_name(database_connection, 2)
+        model_folder_destination = fetch_folder_name(database_connection, 3)
+        mocap_folder_destination = fetch_folder_name(database_connection, 4)
+        material_folder_destination = fetch_folder_name(database_connection, 5)
+        video_folder_destination = fetch_folder_name(database_connection, 6)
+        audio_folder_destination = fetch_folder_name(database_connection, 7)
+
+    else:
+
+        preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
+        with open(preset_path) as f:
+            f_names=json.load(f)
+        
+        images_folder_destination =f_names.get('IMAGE',fetch_folder_name(database_connection, 1))
+        project_folder_destination = f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
+        model_folder_destination = f_names.get('MODEL',fetch_folder_name(database_connection, 3))
+        mocap_folder_destination = f_names.get('MOCAP',fetch_folder_name(database_connection, 4))
+        material_folder_destination =f_names.get('MATERIAL',fetch_folder_name(database_connection, 5))
+        video_folder_destination = f_names.get('VIDEO',fetch_folder_name(database_connection, 6))
+        audio_folder_destination = f_names.get('AUDIO',fetch_folder_name(database_connection, 7))
+
+        
+def blender_folder_on_saved(dummy):
+    global save_count
+    global blender_folder
+    blender_folder = get_blendfile_folder()
+    if save_count == 0:
+
+        blender_folder = get_blendfile_folder()
+
+        os.makedirs(os.path.join(blender_folder,
+                    project_folder_destination), exist_ok=True)
+        new_blender_folder = os.path.join(blender_folder, project_folder_destination)
+
+        old_file_path = bpy.data.filepath
+        bpy.ops.wm.open_mainfile(filepath=old_file_path)
+
+        shutil.move(bpy.data.filepath, new_blender_folder)
+
+        new_file_path = os.path.join(
+            blender_folder, project_folder_destination, os.path.basename(old_file_path))
+        bpy.ops.wm.save_mainfile(filepath=new_file_path)
+
+        if os.path.exists(os.path.join(get_downloads_folder(), "Temp")):
+            for folder in os.listdir(os.path.join(get_downloads_folder(), "Temp")):
+                shutil.move(os.path.join(get_downloads_folder(),
+                            "Temp", folder), blender_folder)
+
+    save_count += 1
 
 
 def log_info(file_name, file_path):
@@ -81,7 +155,7 @@ def get_source_folder(flag):
         newpath_2 = os.path.dirname(newpath_1)
         return newpath_2
 
-
+###### WORK PENDING (NOT IN USE CURRENTLY)##################
 def reload_image_textures():
     for material in bpy.data.materials:
         if material.node_tree:
@@ -102,7 +176,7 @@ def reload_image_textures():
                                   material.name)
         else:
             print("Material", material.name, "does not have a node tree.")
-
+###### WORK PENDING (NOT IN USE CURRENTLY)##################
 
 def organise_zip(zip_file_path, destination_folder, file_name):
 
@@ -138,7 +212,7 @@ def organise_zip(zip_file_path, destination_folder, file_name):
                 flag = True
 
     if flag == True:
-        model_folder = os.path.join(destination_folder, model_folder_name)
+        model_folder = os.path.join(destination_folder, model_folder_destination)
         create_folder(model_folder)
 
         subdirectory_path = os.path.join(model_folder, subdirectory_name)
@@ -149,7 +223,7 @@ def organise_zip(zip_file_path, destination_folder, file_name):
 
     else:
 
-        images_folder = os.path.join(destination_folder, images_folder_name)
+        images_folder = os.path.join(destination_folder, images_folder_destination)
         create_folder(images_folder)
 
         subdirectory_path = os.path.join(images_folder, subdirectory_name)
@@ -193,26 +267,26 @@ def organiser_utility(destination_folder, extension, file_path, file):
 
     if extension in image_files:
         images_folder_path = os.path.join(
-            destination_folder, images_folder_name)
+            destination_folder, images_folder_destination)
         create_folder(images_folder_path)
         duplicate_handler(file_path, file, images_folder_path, extension)
         log_info(file, images_folder_path)
 
     elif extension in project_files:
         project_folder_path = os.path.join(
-            destination_folder, project_folder_name)
+            destination_folder, project_folder_destination)
         create_folder(project_folder_path)
         duplicate_handler(file_path, file, project_folder_path, extension)
         log_info(file, project_folder_path)
 
     elif extension in model_files:
-        model_folder_path = os.path.join(destination_folder, model_folder_name)
+        model_folder_path = os.path.join(destination_folder, model_folder_destination)
         create_folder(model_folder_path)
         duplicate_handler(file_path, file, mocap_folder_path, extension)
         log_info(file, model_folder_path)
 
     elif extension in mocap_files:
-        mocap_folder_path = os.path.join(destination_folder, mocap_folder_name)
+        mocap_folder_path = os.path.join(destination_folder, mocap_folder_destination)
         create_folder(mocap_folder_path)
         duplicate_handler(file_path, file, mocap_folder_path, extension)
         log_info(file, mocap_folder_path)
@@ -223,39 +297,32 @@ def organiser_utility(destination_folder, extension, file_path, file):
 
     elif extension == 'hdr':
         hdri_folder_path = os.path.join(
-            destination_folder, images_folder_name, "HDRI_Images")
+            destination_folder, images_folder_destination, "HDRI_Images")
         create_folder(hdri_folder_path)
         duplicate_handler(file_path, file, hdri_folder_path, extension)
         log_info(file, hdri_folder_path)
 
     elif extension in material_files:
         material_folder_path = os.path.join(
-            destination_folder, project_folder_name, material_folder_name)
+            destination_folder, project_folder_destination, material_folder_destination)
         create_folder(material_folder_path)
         duplicate_handler(file_path, file, material_folder_path, extension)
         log_info(file, material_folder_path)
 
     elif extension in video_files:
         video_folder_path = os.path.join(
-            destination_folder, project_folder_name, video_folder_name)
+            destination_folder, project_folder_destination, video_folder_destination)
         create_folder(video_folder_path)
         duplicate_handler(file_path, file, video_folder_path, extension)
         log_info(file, video_folder_path)
 
     elif extension in video_files:
         audio_folder_path = os.path.join(
-            destination_folder, project_folder_name, audio_folder_name)
+            destination_folder, project_folder_destination, audio_folder_destination)
         create_folder(audio_folder_path)
         duplicate_handler(file_path, file, audio_folder_path, extension)
         log_info(file, audio_folder_path)
 
-
-def get_blendfile_folder():
-    bfp = bpy.data.filepath
-    if bfp:
-        return bpy.path.abspath("//")
-    else:
-        return None
 
 
 def organise(source_folder_flag, destination_folder, localtime_at_Start):
