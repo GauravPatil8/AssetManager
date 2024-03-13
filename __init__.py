@@ -23,7 +23,7 @@ from AAO_UT_FileHandler import database_connection  # variables
 from AAO_DB_FolderNames import close_connection
 from AAO_OT_Onclick_Organise import on_start  # functions
 from AAO_OT_Onclick_Organise import OBJECT_OT_Onclick_Organise  # classes
-from AAO_OT_Onclick_Organise import blender_folder_on_saved
+from AAO_UT_FileHandler import blender_folder_on_saved
 from AAO_OT_Monitoring_Type import OBJECT_OT_monitor_type
 from AAO_OT_Log import OBJECT_OT_log
 from AAO_OT_Log import OBJECT_OT_log_popup
