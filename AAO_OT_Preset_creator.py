@@ -17,7 +17,6 @@ target_folder = os.path.join(package_path, "Presets")
 
 
 def update_folder_path(self,context):
-    if context.scene.folder_presets!='DEFAULT':
         path_constructor()
 
 def reload_panel():
@@ -133,12 +132,11 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
         selected_folder_path = self.filepath
 
         subdirectories = get_subdirectories(selected_folder_path)
-        print(subdirectories)
-        print(subdirectories_relpath_dict)
+        
         subdirectory = subdirectories
 
         context.scene.preset_analysis_folder = selected_folder_path
-        print(context.scene.preset_analysis_folder)
+        
 
         for sub_dir in subdirectories:
             new_enum_property = context.scene.enum_properties.add()
@@ -223,16 +221,6 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
     def draw(self, context):
         global subdirectories
         layout = self.layout
-        box = layout.box()
-        row = box.row(align=True)
-        row.prop(context.scene, "change_folder_name",
-                 text="Change Folder Name")
-
-        if context.scene.change_folder_name:
-            box.prop(context.scene, "folder_name", text="Select Folder Name")
-            box.prop(context.scene, "custom_folder_name",
-                     text="Enter Folder Name")
-            box.operator("object.updatefoldername", text="Set")
 
         layout.label(text='Select a folder')
         row = layout.row()
@@ -240,11 +228,14 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
                  text='', icon='FILE_FOLDER')
         row.operator('folder_selector.open_folder',
                      icon='FILE_FOLDER', text='')
-
+        
         if subdirectory != []:
             for enum_property in context.scene.enum_properties:
                 new_row = layout.row()
                 new_row.prop(enum_property, "name", text="")
                 new_row.prop(enum_property, "value", text="")
-        layout.prop(context.scene, 'preset_name', text="Enter preset name")
-        layout.operator('object.savepreset', text='Save Preset')
+            layout.prop(context.scene, 'preset_name', text="Enter preset name")
+            layout.operator('object.savepreset', text='Save Preset')
+
+
+        
