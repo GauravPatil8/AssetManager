@@ -29,6 +29,7 @@ def get_blender_folder_path():
 def on_start(dummy):
     global local_time_at_start
     local_time_at_start = time.time()
+    print(f'hello dost time toh dekh {local_time_at_start}')
 
 
 
@@ -51,7 +52,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     bl_idname = "object.onclickorganise"
     bl_description = "Clicking this organizes downloaded files"
 
-    on_start(None)
+    
 
     def execute(self, context):
         selected_folder = context.scene.monitor_folder
@@ -65,7 +66,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), "Temp")
                 create_folder(temporary_folder)
-                print(temporary_folder)
+                
                 threading.Thread(target=organise, daemon=True, args=(
                     '0', temporary_folder, local_time_at_start)).start()
                 self.report({'INFO'}, "Organising Files")
