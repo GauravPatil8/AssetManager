@@ -4,7 +4,7 @@
 # ('4',"Mocap_data")
 # ('5',"Material_files")
 # ('6',"Video_files")
-# ('7',"Audio_files")
+# ('7',"Audio_files") 
 
 import os
 import shutil
@@ -79,8 +79,9 @@ def path_constructor():
 
 
     scene = bpy.context.scene
+    
     if scene.folder_presets!='DEFAULT':
-        print("in path construct")
+        
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
             f_names=json.load(f)
@@ -92,19 +93,28 @@ def path_constructor():
         material_folder_destination =f_names.get('MATERIAL',fetch_folder_name(database_connection, 5))
         video_folder_destination = f_names.get('VIDEO',fetch_folder_name(database_connection, 6))
         audio_folder_destination = f_names.get('AUDIO',fetch_folder_name(database_connection, 7))
-
+    else:
+        images_folder_destination = fetch_folder_name(database_connection, 1)
+        project_folder_destination = fetch_folder_name(database_connection, 2)
+        model_folder_destination = fetch_folder_name(database_connection, 3)
+        mocap_folder_destination = fetch_folder_name(database_connection, 4)
+        material_folder_destination = fetch_folder_name(database_connection, 5)
+        video_folder_destination = fetch_folder_name(database_connection, 6)
+        audio_folder_destination = fetch_folder_name(database_connection, 7)
+    
         
 def blender_folder_on_saved(dummy):
     global save_flag
     global blender_folder
+
     blender_folder = get_blendfile_folder()
     if save_flag == False:
 
         blender_folder = get_blendfile_folder()
-
-        os.makedirs(os.path.join(blender_folder,
-                    project_folder_destination), exist_ok=True)
         new_blender_folder = os.path.join(blender_folder, project_folder_destination)
+        if not os.path.exists(new_blender_folder):
+            os.makedirs(new_blender_folder)
+        
 
         old_file_path = bpy.data.filepath
         bpy.ops.wm.open_mainfile(filepath=old_file_path)
@@ -119,8 +129,9 @@ def blender_folder_on_saved(dummy):
             for folder in os.listdir(os.path.join(get_downloads_folder(), "Temp")):
                 shutil.move(os.path.join(get_downloads_folder(),
                             "Temp", folder), blender_folder)
-
-    save_flag =True
+        
+        reload_image_textures(os.path.join(blender_folder,images_folder_destination))
+        save_flag =True
 
 
 def log_info(file_name, file_path):
@@ -146,28 +157,31 @@ def get_source_folder(flag):
         newpath_2 = os.path.dirname(newpath_1)
         return newpath_2
 
-###### WORK PENDING (NOT IN USE CURRENTLY)##################
-def reload_image_textures():
+
+def reload_image_textures(target_folder):
     for material in bpy.data.materials:
         if material.node_tree:
             for node in material.node_tree.nodes:
                 if node.type == 'TEX_IMAGE':
                     image_texture = node.image
                     if image_texture:
-                        # Check if the image has a filepath
+                        
                         if image_texture.filepath:
-                            # Change the path to the new one
-                            new_filepath = R"C:\Users\GAURAV\Downloads\Temp\HERO_01_new.png"  # Change the path here
-                            image_texture.filepath = bpy.path.abspath(
-                                new_filepath)
-                            # Reload the image
+                            
+                            filename = os.path.basename(image_texture.filepath)
+                            print(filename)
+                            
+                            new_filepath = os.path.join(target_folder, filename)
+                            print(new_filepath)
+                           
+                            image_texture.filepath = bpy.path.abspath(new_filepath)
+                            
                             image_texture.reload()
-                            # Notify the user
-                            print("Image texture reloaded for material:",
-                                  material.name)
+                            
+                            print("Image texture reloaded for material:", material.name)
         else:
             print("Material", material.name, "does not have a node tree.")
-###### WORK PENDING (NOT IN USE CURRENTLY)##################
+
 
 def organise_zip(zip_file_path, destination_folder, file_name):
 
@@ -319,7 +333,7 @@ def organiser_utility(destination_folder, extension, file_path, file):
 def organise(source_folder_flag, destination_folder, localtime_at_Start):
 
     for file in os.listdir(get_source_folder(source_folder_flag)):
-
+                                
         file_path = os.path.join(get_source_folder(source_folder_flag), file)
         if os.path.isfile(file_path):
 
