@@ -90,13 +90,15 @@ def path_constructor():
 
     scene = bpy.context.scene
     
-    if scene.folder_presets!='default':
+    if scene.folder_presets!='DEFAULT':
         
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
+        
         with open(preset_path) as f:
             f_names=json.load(f)
         
         images_folder_destination = f_names.get('IMAGE',"Textures")
+        print(images_folder_destination)
         project_folder_destination = f_names.get('PROJECT',"Project_Files")
         model_folder_destination = f_names.get('MODEL',"Models")
         material_folder_destination =f_names.get('MATERIAL',"Material_files")

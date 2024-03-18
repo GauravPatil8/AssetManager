@@ -11,7 +11,7 @@ subdirectories_relpath_dict = {}
 json_data = {}
 subdirectory = []
 selected_folder_path = None
-preset_list = []
+preset_list = [('DEFAULT', 'Default','Stores downloaded files in a simple folder structure based on their type'),]
 package_path = get_package_path()
 target_folder = os.path.join(package_path,preset_folder_name)
 
@@ -19,7 +19,7 @@ clearance_flag=False
 
 
 def update_folder_path(self,context):
-        path_constructor()
+    path_constructor()
 
 def reload_panel():
     bpy.utils.unregister_class(OBJECT_PT_preset_creator)
@@ -39,7 +39,7 @@ def generator_list(self, context):
     global preset_list
     preset_list[1:] = []
     for file in os.listdir(target_folder):
-        if os.path.isfile(os.path.join(target_folder, file)) and file != 'Default.db':
+        if os.path.isfile(os.path.join(target_folder, file)):
             file_name = file.split('.')[0]
             file_description = ''
             preset_list.append(tuple([file_name, file_name, file_description]))
