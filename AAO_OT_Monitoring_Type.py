@@ -3,24 +3,20 @@ import os
 import time
 import threading
 from AAO_UT_FileHandler import organise
+from AAO_UT_FileHandler import temporary_folder_name
 from AAO_OT_Onclick_Organise import is_blend_file_saved
 from AAO_OT_Onclick_Organise import get_downloads_folder
 from AAO_OT_Onclick_Organise import get_blendfile_folder
 from AAO_OT_Onclick_Organise import create_folder
 from AAO_OT_Onclick_Organise import local_time_at_start
+from AAO_OT_Onclick_Organise import get_blender_folder_path
 
-stop_event = threading.Event()
+loop_flag=True
 thread_flag = False
 report_flag = False
 blender_folder = None
+stop_event = threading.Event()
 
-
-def get_blender_folder_path():
-    global blender_folder
-    old_blender_folder = get_blendfile_folder()
-    if old_blender_folder:
-        one_blender_folder = os.path.dirname(old_blender_folder)
-        blender_folder = os.path.dirname(one_blender_folder)
 
 
 def monitoring_type_prop_update_handler(self, context):
@@ -65,11 +61,10 @@ def realtime_monitoring(self, context, stop_event):
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
                 get_blender_folder_path()
-                print(blender_folder)
                 organise('0', blender_folder, local_time_at_start)
 
             else:
-                temporary_folder = os.path.join(get_downloads_folder(), "Temp")
+                temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
                 create_folder(temporary_folder)
                 organise('0', temporary_folder, local_time_at_start)
         else:
@@ -81,10 +76,8 @@ def realtime_monitoring(self, context, stop_event):
 
         if context.scene.delay_time_prop == 'THREE':
             time.sleep(3)
-
         elif context.scene.delay_time_prop == 'SEVEN':
             time.sleep(7)
-
         else:
             time.sleep(10)
 
