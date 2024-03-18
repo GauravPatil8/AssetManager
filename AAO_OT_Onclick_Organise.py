@@ -3,36 +3,37 @@ from AAO_UT_FileHandler import create_folder
 from AAO_UT_FileHandler import get_downloads_folder
 from AAO_UT_FileHandler import is_blend_file_saved
 from AAO_UT_FileHandler import organise
+from AAO_UT_FileHandler import return_projectfile_name
+from AAO_UT_FileHandler import temporary_folder_name
 import sys
 import bpy
 import os
 import time
 import threading
+
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
 
-
+loop_flag=True
+local_time_at_start = None
 blender_folder = None
 
 
-local_time_at_start = None
 
-###ye function ko improve karna bhai######
 def get_blender_folder_path():
     global blender_folder
-    old_blender_folder = get_blendfile_folder()
-    if old_blender_folder:
-        one_blender_folder = os.path.dirname(old_blender_folder)
-        blender_folder = os.path.dirname(one_blender_folder)
+    global loop_flag
+    blender_folder = get_blendfile_folder()
+    project_file_name=return_projectfile_name()
+    while loop_flag:
+        if os.path.basename(blender_folder)==project_file_name:
+            loop_flag=False
+        blender_folder = os.path.dirname(blender_folder)
 
 def on_start(dummy):
     global local_time_at_start
     local_time_at_start = time.time()
-    print(f'hello dost time toh dekh {local_time_at_start}')
-
-
-
 
 
 class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):
@@ -64,7 +65,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
                     '0', blender_folder, local_time_at_start)).start()
 
             else:
-                temporary_folder = os.path.join(get_downloads_folder(), "Temp")
+                temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
                 create_folder(temporary_folder)
                 
                 threading.Thread(target=organise, daemon=True, args=(
