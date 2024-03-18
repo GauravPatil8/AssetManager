@@ -6,14 +6,16 @@ from bpy.props import StringProperty
 from AAO_UT_FileHandler import get_package_path
 from AAO_UT_FileHandler import path_constructor
 
+preset_folder_name="Presets"
 subdirectories_relpath_dict = {}
 json_data = {}
-selected_folder_path = None
-preset_list = [('DEFAULT', 'Default',
-                'Stores downloaded files in a simple folder structure based on their type'),]
-package_path = get_package_path()
 subdirectory = []
-target_folder = os.path.join(package_path, "Presets")
+selected_folder_path = None
+preset_list = [('DEFAULT', 'Default','Stores downloaded files in a simple folder structure based on their type'),]
+package_path = get_package_path()
+target_folder = os.path.join(package_path,preset_folder_name)
+
+clearance_flag=False
 
 
 def update_folder_path(self,context):
@@ -26,10 +28,10 @@ def reload_panel():
 
 def duplicate_tags_checker(context):
     seen = set()
-    for tag in context.scene.enum_properties:
-        if tag.value != 'NONE' and tag.value in seen:
+    for tag_enum in context.scene.enum_properties:
+        if tag_enum.tag != 'NONE' and tag_enum.tag in seen:
             return True
-        seen.add(tag.value)
+        seen.add(tag_enum.tag)
     return False
 
 
@@ -63,18 +65,17 @@ def get_subdirectories(directory):
 
 class ENUM_PROPS_Tags(bpy.types.PropertyGroup):
     name: bpy.props.StringProperty()  # type: ignore
-    value: bpy.props.EnumProperty(
+    tag: bpy.props.EnumProperty(
         items=[
-            ('NONE', 'none', ''),
-            ('PROJECT', 'project_files', ''),
-            ('MODEL', 'model_files', ''),
-            ('IMAGE', 'image_files', ''),
-            ('MOCAP', 'mocap_files', ''),
-            ('MATERIAL', 'material_files', ''),
-            ('VIDEO', 'video_files', ''),
-            ('AUDIO', 'audio_files', '')
+            ('NONE', 'none', 'No Tags'),
+            ('PROJECT', 'project_files', "This tag is designated for storing files with extensions such as 'max,' '3ds,' 'blend,' 'c4d,' 'bgeo,' and 'geo.' Any files with these extensions will be organized and kept in this folder."),
+            ('MODEL', 'model_files', "This tag will be used to categorize and store files with specific extensions, including 'obj', 'fbx', 'usdz', 'dae', 'usd*', 'ply', 'glb', 'gltf', and 'x3d'. These files will be organized and kept in this designated folder."),
+            ('IMAGE', 'image_files', "This tag designates a folder where files with the following extensions will be stored: ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp', 'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif']. These file types will be saved in the specified location."),
+            ('MATERIAL', 'material_files', "This tag designates a folder for storing files with specific extensions such as 'sbsar', 'spsm', 'spp', and 'sbs'."),
+            ('VIDEO', 'video_files', "This tag designates a folder where files with extensions such as 'mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', and 'flv' will be organized and stored."),
+            ('AUDIO', 'audio_files', "This tag designates the types of files that will be stored in a specific folder. It includes a variety of audio file extensions such as 'wav,' 'mp3,' 'flac,' 'ogg,' 'm3u,' 'acc,' 'wma,' 'midi,' 'aif,' 'm4a,' 'mpa,' and 'pls.'")
         ],
-        name="Value"
+        name="tag"
     )  # type: ignore
 
 
@@ -128,20 +129,33 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
         global subdirectories_relpath_dict
         global json_data
         global subdirectory
-
+        global clearance_flag
+        indices_to_remove=[]
+        enum_properties = context.scene.enum_properties
         selected_folder_path = self.filepath
-
         subdirectories = get_subdirectories(selected_folder_path)
+            
         
+
+        if clearance_flag==False: 
+            clearance_flag=True
+        else:
+            for index in enumerate(enum_properties):
+                indices_to_remove.append(index)
+
+            for index in reversed(indices_to_remove):
+                enum_properties.remove(index)
+
+
         subdirectory = subdirectories
 
         context.scene.preset_analysis_folder = selected_folder_path
-        
+            
 
         for sub_dir in subdirectories:
-            new_enum_property = context.scene.enum_properties.add()
-            new_enum_property.name = sub_dir
-            new_enum_property.value = "NONE"
+                new_enum_property = context.scene.enum_properties.add()
+                new_enum_property.name = sub_dir
+                new_enum_property.tag = "NONE"
         reload_panel()
         return {'FINISHED'}
 
@@ -185,13 +199,13 @@ class OBJECT_OT_save_preset(bpy.types.Operator):
                         path = subdirectories_relpath_dict[subdir_keys[i]]
                         base_dir = os.path.dirname(path)
                         final_path = os.path.join(base_dir, enum_property.name)
-                        json_data[enum_property.value] = final_path
+                        json_data[enum_property.tag] = final_path
                     else:
                         path = subdirectories_relpath_dict[subdir_keys[i]]
-                        json_data[enum_property.value] = path
+                        json_data[enum_property.tag] = path
 
                     json_preset_path = os.path.join(
-                        package_path, 'Presets', context.scene.preset_name+'.json')
+                        package_path, preset_folder_name, context.scene.preset_name+'.json')
                     with open(json_preset_path, 'w') as json_file:
                         json.dump(json_data, json_file, indent=4)
                 self.report(
@@ -233,9 +247,6 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
             for enum_property in context.scene.enum_properties:
                 new_row = layout.row()
                 new_row.prop(enum_property, "name", text="")
-                new_row.prop(enum_property, "value", text="")
+                new_row.prop(enum_property, "tag", text="")
             layout.prop(context.scene, 'preset_name', text="Enter preset name")
             layout.operator('object.savepreset', text='Save Preset')
-
-
-        
