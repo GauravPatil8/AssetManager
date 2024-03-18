@@ -11,7 +11,7 @@ subdirectories_relpath_dict = {}
 json_data = {}
 subdirectory = []
 selected_folder_path = None
-preset_list = [('DEFAULT', 'Default','Stores downloaded files in a simple folder structure based on their type'),]
+preset_list = []
 package_path = get_package_path()
 target_folder = os.path.join(package_path,preset_folder_name)
 

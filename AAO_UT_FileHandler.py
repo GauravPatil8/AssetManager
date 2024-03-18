@@ -27,7 +27,7 @@ package_path = get_package_path()
 file_folder_path = os.path.join(package_path, "Presets")
 if not os.path.exists(file_folder_path):
     os.mkdir(file_folder_path)
-file_path = os.path.join(file_folder_path, "Default.db")
+file_path = os.path.join(file_folder_path, "default.db")
 
 # temporary hai
 images_folder_destination = "Textures"
@@ -69,7 +69,7 @@ def get_blendfile_folder():
 def return_projectfile_name():
     scene = bpy.context.scene
     
-    if scene.folder_presets!='DEFAULT':
+    if scene.folder_presets!='default':
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
             f_names=json.load(f)
@@ -90,7 +90,7 @@ def path_constructor():
 
     scene = bpy.context.scene
     
-    if scene.folder_presets!='DEFAULT':
+    if scene.folder_presets!='default':
         
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
