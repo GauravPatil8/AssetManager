@@ -2,18 +2,17 @@ import bpy
 import os
 import time
 import threading
-from AAO_UT_FileHandler import organise
-from AAO_UT_FileHandler import temporary_folder_name
-from AAO_OT_Onclick_Organise import is_blend_file_saved
-from AAO_OT_Onclick_Organise import get_downloads_folder
-from AAO_OT_Onclick_Organise import get_blendfile_folder
-from AAO_OT_Onclick_Organise import create_folder
-from AAO_OT_Onclick_Organise import local_time_at_start
-from AAO_OT_Onclick_Organise import get_blender_folder_path
+from aao_ut_filehandler import organise
+from aao_ut_filehandler import temporary_folder_name
+from aao_ot_onclick_organise import is_blend_file_saved
+from aao_ot_onclick_organise import get_downloads_folder
+from aao_ot_onclick_organise import get_blendfile_folder
+from aao_ot_onclick_organise import create_folder
+from aao_ot_onclick_organise import local_time_at_start
+from aao_ot_onclick_organise import get_blender_folder_path
 
 loop_flag=True
 thread_flag = False
-report_flag = False
 blender_folder = None
 stop_event = threading.Event()
 
@@ -24,9 +23,10 @@ def monitoring_type_prop_update_handler(self, context):
     global report_flag
 
     if self.monitoring_type_prop == 'ONCLICKOPERATOR':
+        print("in update")
         stop_event.set()
         thread_flag = False
-        report_flag = False
+        
 
 
 class ENUM_PROPS_monitoring_type(bpy.types.PropertyGroup):
@@ -90,6 +90,7 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
     def execute(self, context):
         global thread_flag
         global stop_event
+        global report_flag
         stop_event.clear()
 
         if context.scene.monitor_folder != "DOWNLOADS":
@@ -111,8 +112,5 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
                 self.report({'INFO'}, "Real-time monitoring has started")
                 thread_flag = True
 
-        if report_flag == True:
-            self.report(
-                {'WARNING'}, "Real-time monitoring has already Started")
 
         return {'FINISHED'}

@@ -3,8 +3,8 @@ import os
 import json
 from bpy.types import Context, Operator
 from bpy.props import StringProperty
-from AAO_UT_FileHandler import get_package_path
-from AAO_UT_FileHandler import path_constructor
+from aao_ut_filehandler import get_package_path
+from aao_ut_filehandler import path_constructor
 
 preset_folder_name="Presets"
 subdirectories_relpath_dict = {}
@@ -140,7 +140,7 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
         if clearance_flag==False: 
             clearance_flag=True
         else:
-            for index in enumerate(enum_properties):
+            for index,enum_property in enumerate(enum_properties):
                 indices_to_remove.append(index)
 
             for index in reversed(indices_to_remove):

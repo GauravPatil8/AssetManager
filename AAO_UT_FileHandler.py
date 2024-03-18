@@ -11,9 +11,7 @@ import bpy
 import zipfile
 import json
 import sys
-from AAO_DB_FolderNames import fetch_folder_name
-from AAO_DB_FolderNames import create_and_populate
-from AAO_OT_Log import file_data
+from aao_ot_log import file_data
 
 
 blender_folder=''
@@ -31,14 +29,13 @@ if not os.path.exists(file_folder_path):
     os.mkdir(file_folder_path)
 file_path = os.path.join(file_folder_path, "Default.db")
 
-database_connection = create_and_populate(file_path)
 # temporary hai
-images_folder_destination = fetch_folder_name(database_connection, 1)
-project_folder_destination = fetch_folder_name(database_connection, 2)
-model_folder_destination = fetch_folder_name(database_connection, 3)
-material_folder_destination = fetch_folder_name(database_connection, 4)
-video_folder_destination = fetch_folder_name(database_connection, 5)
-audio_folder_destination = fetch_folder_name(database_connection, 6)
+images_folder_destination = "Textures"
+project_folder_destination = "Project_Files"
+model_folder_destination = "Models"
+material_folder_destination = "Material_files"
+video_folder_destination = "Video_files"
+audio_folder_destination = "Audio_files"
 temporary_folder_name='Temporary asset folder'
 
 
@@ -76,9 +73,9 @@ def return_projectfile_name():
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
             f_names=json.load(f)
-        return f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
+        return f_names.get('PROJECT',"Project_Files")
     else:
-        return fetch_folder_name(database_connection, 2)
+        return "Project_Files"
         
 
 def path_constructor():
@@ -99,19 +96,19 @@ def path_constructor():
         with open(preset_path) as f:
             f_names=json.load(f)
         
-        images_folder_destination = f_names.get('IMAGE',fetch_folder_name(database_connection, 1))
-        project_folder_destination = f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
-        model_folder_destination = f_names.get('MODEL',fetch_folder_name(database_connection, 3))
-        material_folder_destination =f_names.get('MATERIAL',fetch_folder_name(database_connection, 4))
-        video_folder_destination = f_names.get('VIDEO',fetch_folder_name(database_connection, 5))
-        audio_folder_destination = f_names.get('AUDIO',fetch_folder_name(database_connection, 6))
+        images_folder_destination = f_names.get('IMAGE',"Textures")
+        project_folder_destination = f_names.get('PROJECT',"Project_Files")
+        model_folder_destination = f_names.get('MODEL',"Models")
+        material_folder_destination =f_names.get('MATERIAL',"Material_files")
+        video_folder_destination = f_names.get('VIDEO',"Video_files")
+        audio_folder_destination = f_names.get('AUDIO',"Audio_files")
     else:
-        images_folder_destination = fetch_folder_name(database_connection, 1)
-        project_folder_destination = fetch_folder_name(database_connection, 2)
-        model_folder_destination = fetch_folder_name(database_connection, 3)
-        material_folder_destination = fetch_folder_name(database_connection, 4)
-        video_folder_destination = fetch_folder_name(database_connection, 5)
-        audio_folder_destination = fetch_folder_name(database_connection, 6)
+        images_folder_destination = "Textures"
+        project_folder_destination = "Project_Files"
+        model_folder_destination = "Models"
+        material_folder_destination = "Material_files"
+        video_folder_destination = "Video_files"
+        audio_folder_destination = "Audio_files"
     
         
 def blender_folder_on_saved(dummy):

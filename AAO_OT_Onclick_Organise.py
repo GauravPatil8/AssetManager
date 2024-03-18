@@ -1,10 +1,10 @@
-from AAO_UT_FileHandler import get_blendfile_folder
-from AAO_UT_FileHandler import create_folder
-from AAO_UT_FileHandler import get_downloads_folder
-from AAO_UT_FileHandler import is_blend_file_saved
-from AAO_UT_FileHandler import organise
-from AAO_UT_FileHandler import return_projectfile_name
-from AAO_UT_FileHandler import temporary_folder_name
+from aao_ut_filehandler import get_blendfile_folder
+from aao_ut_filehandler import create_folder
+from aao_ut_filehandler import get_downloads_folder
+from aao_ut_filehandler import is_blend_file_saved
+from aao_ut_filehandler import organise
+from aao_ut_filehandler import return_projectfile_name
+from aao_ut_filehandler import temporary_folder_name
 import sys
 import bpy
 import os
@@ -52,7 +52,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     bl_label = 'onlick_organise'
     bl_idname = "object.onclickorganise"
     bl_description = "Clicking this organizes downloaded files"
-
+    on_start(None)
     
 
     def execute(self, context):

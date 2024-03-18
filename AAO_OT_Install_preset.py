@@ -1,7 +1,7 @@
 import bpy
 from bpy.props import StringProperty
-from AAO_UT_FileHandler import get_package_path
-from AAO_OT_Preset_creator import preset_folder_name
+from aao_ut_filehandler import get_package_path
+from aao_ot_preset_creator import preset_folder_name
 import os 
 import shutil
 
