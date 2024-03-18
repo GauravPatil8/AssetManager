@@ -52,19 +52,18 @@ classes = ( ENUM_PROPS_monitor_folder,ENUM_PROPS_delay_time, ENUM_PROPS_Tags, EN
 
 
 def register():
-    
+    bpy.app.handlers.save_post.append(blender_folder_on_saved)
     for kls in classes:
         bpy.utils.register_class(kls)
     bpy.types.Scene.enum_properties = bpy.props.CollectionProperty(type=ENUM_PROPS_Tags)
-    bpy.app.handlers.save_post.append(blender_folder_on_saved)
+    
     
     
 def unregister():
 
     for kls in reversed(classes):
         bpy.utils.unregister_class(kls)
-        
-    bpy.app.handlers.save_post.remove(blender_folder_on_saved)
-    del bpy.types.Scene.enum_properties
     
+    del bpy.types.Scene.enum_properties
+    bpy.app.handlers.save_post.remove(blender_folder_on_saved)
 
