@@ -1,10 +1,9 @@
 # ('1',"Textures"),
 # ('2',"Project_Files"),
 # ('3',"Models"),
-# ('4',"Mocap_data")
-# ('5',"Material_files")
-# ('6',"Video_files")
-# ('7',"Audio_files") 
+# ('4',"Material_files")
+# ('5',"Video_files")
+# ('6',"Audio_files") 
 
 import os
 import shutil
@@ -37,16 +36,16 @@ database_connection = create_and_populate(file_path)
 images_folder_destination = fetch_folder_name(database_connection, 1)
 project_folder_destination = fetch_folder_name(database_connection, 2)
 model_folder_destination = fetch_folder_name(database_connection, 3)
-mocap_folder_destination = fetch_folder_name(database_connection, 4)
-material_folder_destination = fetch_folder_name(database_connection, 5)
-video_folder_destination = fetch_folder_name(database_connection, 6)
-audio_folder_destination = fetch_folder_name(database_connection, 7)
+material_folder_destination = fetch_folder_name(database_connection, 4)
+video_folder_destination = fetch_folder_name(database_connection, 5)
+audio_folder_destination = fetch_folder_name(database_connection, 6)
+temporary_folder_name='Temporary asset folder'
 
 
-project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo']
+project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo','zpr']
 
 model_files = ['obj', 'fbx', 'usdz', 'dae',
-               'usd*', 'ply', 'glb', 'gltf', 'x3d']
+               'usd*', 'ply', 'glb', 'gltf', 'x3d','ztl','stl']
 
 image_files = ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp',
                'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif',]
@@ -67,6 +66,20 @@ def get_blendfile_folder():
         return bpy.path.abspath("//")
     else:
         return None
+
+
+
+def return_projectfile_name():
+    scene = bpy.context.scene
+    
+    if scene.folder_presets!='DEFAULT':
+        preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
+        with open(preset_path) as f:
+            f_names=json.load(f)
+        return f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
+    else:
+        return fetch_folder_name(database_connection, 2)
+        
 
 def path_constructor():
     global images_folder_destination 
@@ -89,18 +102,16 @@ def path_constructor():
         images_folder_destination = f_names.get('IMAGE',fetch_folder_name(database_connection, 1))
         project_folder_destination = f_names.get('PROJECT',fetch_folder_name(database_connection, 2))
         model_folder_destination = f_names.get('MODEL',fetch_folder_name(database_connection, 3))
-        mocap_folder_destination = f_names.get('MOCAP',fetch_folder_name(database_connection, 4))
-        material_folder_destination =f_names.get('MATERIAL',fetch_folder_name(database_connection, 5))
-        video_folder_destination = f_names.get('VIDEO',fetch_folder_name(database_connection, 6))
-        audio_folder_destination = f_names.get('AUDIO',fetch_folder_name(database_connection, 7))
+        material_folder_destination =f_names.get('MATERIAL',fetch_folder_name(database_connection, 4))
+        video_folder_destination = f_names.get('VIDEO',fetch_folder_name(database_connection, 5))
+        audio_folder_destination = f_names.get('AUDIO',fetch_folder_name(database_connection, 6))
     else:
         images_folder_destination = fetch_folder_name(database_connection, 1)
         project_folder_destination = fetch_folder_name(database_connection, 2)
         model_folder_destination = fetch_folder_name(database_connection, 3)
-        mocap_folder_destination = fetch_folder_name(database_connection, 4)
-        material_folder_destination = fetch_folder_name(database_connection, 5)
-        video_folder_destination = fetch_folder_name(database_connection, 6)
-        audio_folder_destination = fetch_folder_name(database_connection, 7)
+        material_folder_destination = fetch_folder_name(database_connection, 4)
+        video_folder_destination = fetch_folder_name(database_connection, 5)
+        audio_folder_destination = fetch_folder_name(database_connection, 6)
     
         
 def blender_folder_on_saved(dummy):
@@ -259,8 +270,7 @@ def duplicate_handler(file_path, file, folder_path, extension):
     global filecount
     if os.path.exists(os.path.join(folder_path, file)):
         new_file_name = file.split('.')[0]+'_'+str(filecount)
-        new_file_path = os.path.join(os.path.dirname(
-            file_path), new_file_name+'.'+extension)
+        new_file_path = os.path.join(os.path.dirname(file_path), new_file_name+'.'+extension)
         os.rename(file_path, new_file_path)
         shutil.move(new_file_path, folder_path)
     else:
@@ -331,10 +341,10 @@ def organiser_utility(destination_folder, extension, file_path, file):
 
 
 def organise(source_folder_flag, destination_folder, localtime_at_Start):
-
-    for file in os.listdir(get_source_folder(source_folder_flag)):
+    source_folder=get_source_folder(source_folder_flag)
+    for file in os.listdir(source_folder):
                                 
-        file_path = os.path.join(get_source_folder(source_folder_flag), file)
+        file_path = os.path.join(source_folder, file)
         if os.path.isfile(file_path):
 
             # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
