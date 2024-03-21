@@ -10,7 +10,7 @@ from aao_ot_onclick_organise import get_blendfile_folder
 from aao_ot_onclick_organise import create_folder
 from aao_ot_onclick_organise import local_time_at_start
 from aao_ot_onclick_organise import get_blender_folder_path
-
+report_flag=False
 loop_flag=True
 thread_flag = False
 blender_folder = None
@@ -23,9 +23,9 @@ def monitoring_type_prop_update_handler(self, context):
     global report_flag
 
     if self.monitoring_type_prop == 'ONCLICKOPERATOR':
-        print("in update")
         stop_event.set()
         thread_flag = False
+        report_flag = False
         
 
 
@@ -93,24 +93,25 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
         global report_flag
         stop_event.clear()
 
-        if context.scene.monitor_folder != "DOWNLOADS":
-            if is_blend_file_saved():
-                self.report({'INFO'}, "Real-time monitoring has started")
+        if report_flag==True:
+            self.report({'WARNING'},"Real-time monitoring has already started")
+        else:
+            if context.scene.monitor_folder != "DOWNLOADS":
+                if is_blend_file_saved():
+                    self.report({'INFO'}, "Real-time monitoring has started")
+                    if thread_flag == False:
+                        thread_flag = True
+                        threading.Thread(target=realtime_monitoring, daemon=True, args=(
+                            self, context, stop_event)).start()
+                        self.report({'INFO'}, "Real-time monitoring has started")
+                else:
+                    self.report(
+                        {'ERROR'}, "Blender file has not been saved. Please save your Blender file before utilizing this option.")
+                    context.scene.monitor_folder = "DOWNLOADS"
+            else:
                 if thread_flag == False:
-                    thread_flag = True
                     threading.Thread(target=realtime_monitoring, daemon=True, args=(
                         self, context, stop_event)).start()
                     self.report({'INFO'}, "Real-time monitoring has started")
-            else:
-                self.report(
-                    {'ERROR'}, "Blender file has not been saved. Please save your Blender file before utilizing this option.")
-                context.scene.monitor_folder = "DOWNLOADS"
-        else:
-            if thread_flag == False:
-                threading.Thread(target=realtime_monitoring, daemon=True, args=(
-                    self, context, stop_event)).start()
-                self.report({'INFO'}, "Real-time monitoring has started")
-                thread_flag = True
-
-
+                    thread_flag = True
         return {'FINISHED'}
