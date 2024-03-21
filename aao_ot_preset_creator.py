@@ -236,7 +236,7 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
         global subdirectories
         layout = self.layout
 
-        layout.label(text='Select a folder')
+        layout.label(text='Select a folder:')
         row = layout.row()
         row.prop(context.scene, 'preset_analysis_folder',
                  text='', icon='FILE_FOLDER')
