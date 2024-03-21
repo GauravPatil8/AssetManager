@@ -17,7 +17,26 @@ class OBJECT_OT_Install_preset(bpy.types.Operator):
     def execute(self, context):
         preset_path = self.filepath
         shutil.move(preset_path,preset_destination_path)
-        self.report({'INFO'},"Preset Installed.")
+        self.report({'INFO'},"Preset installed.")
+        return {'FINISHED'}
+    
+    def invoke(self, context, event):
+        context.window_manager.fileselect_add(self)
+        return {'RUNNING_MODAL'}
+
+class OBJECT_OT_share_preset(bpy.types.Operator):
+    bl_label="share Preset"
+    bl_idname="ot.sharepreset"
+    bl_description="share any preset from local device."
+
+    filepath: StringProperty(subtype="DIR_PATH")  #type: ignore
+
+    def execute(self, context):
+        preset_basename=context.scene.folder_presets
+        folder_path = self.filepath
+        preset_path=os.path.join(preset_destination_path,preset_basename+'.json')
+        shutil.copy(preset_path,folder_path)
+        self.report({'INFO'},"Preset shared.")
         return {'FINISHED'}
     
     def invoke(self, context, event):
