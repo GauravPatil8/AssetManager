@@ -1,10 +1,3 @@
-# ('1',"Textures"),
-# ('2',"Project_Files"),
-# ('3',"Models"),
-# ('4',"Material_files")
-# ('5',"Video_files")
-# ('6',"Audio_files") 
-
 import os
 import shutil
 import bpy
@@ -39,15 +32,13 @@ audio_folder_destination = "Audio_files"
 temporary_folder_name='Temporary asset folder'
 
 
-project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo','zpr']
+project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo','zpr','ma','mb','skp','3dm','sldprt','sldasm','zbp','hip']
 
 model_files = ['obj', 'fbx', 'usdz', 'dae',
-               'usd*', 'ply', 'glb', 'gltf', 'x3d','ztl','stl']
+               'usd*', 'ply', 'glb', 'gltf', 'x3d','ztl','stl','abc']
 
 image_files = ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp',
-               'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif',]
-
-mocap_files = ['bvh']
+               'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif','avif']
 
 material_files = ['sbsar', 'spsm', 'spp', 'sbs']
 
@@ -97,13 +88,12 @@ def path_constructor():
         with open(preset_path) as f:
             f_names=json.load(f)
         
-        images_folder_destination = f_names.get('IMAGE',"Textures")
-        print(images_folder_destination)
-        project_folder_destination = f_names.get('PROJECT',"Project_Files")
-        model_folder_destination = f_names.get('MODEL',"Models")
-        material_folder_destination =f_names.get('MATERIAL',"Material_files")
-        video_folder_destination = f_names.get('VIDEO',"Video_files")
-        audio_folder_destination = f_names.get('AUDIO',"Audio_files")
+        images_folder_destination = f_names.get('IMAGE',images_folder_destination)
+        project_folder_destination = f_names.get('PROJECT',project_folder_destination)
+        model_folder_destination = f_names.get('MODEL',model_folder_destination)
+        material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
+        video_folder_destination = f_names.get('VIDEO',video_folder_destination)
+        audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
     else:
         images_folder_destination = "Textures"
         project_folder_destination = "Project_Files"
@@ -179,18 +169,11 @@ def reload_image_textures(target_folder):
                         if image_texture.filepath:
                             
                             filename = os.path.basename(image_texture.filepath)
-                            print(filename)
-                            
                             new_filepath = os.path.join(target_folder, filename)
-                            print(new_filepath)
-                           
                             image_texture.filepath = bpy.path.abspath(new_filepath)
-                            
                             image_texture.reload()
                             
-                            print("Image texture reloaded for material:", material.name)
-        else:
-            print("Material", material.name, "does not have a node tree.")
+            
 
 
 def organise_zip(zip_file_path, destination_folder, file_name):
@@ -296,14 +279,9 @@ def organiser_utility(destination_folder, extension, file_path, file):
     elif extension in model_files:
         model_folder_path = os.path.join(destination_folder, model_folder_destination)
         create_folder(model_folder_path)
-        duplicate_handler(file_path, file, mocap_folder_path, extension)
+        duplicate_handler(file_path, file, model_folder_path, extension)
         log_info(file, model_folder_path)
 
-    elif extension in mocap_files:
-        mocap_folder_path = os.path.join(destination_folder, mocap_folder_destination)
-        create_folder(mocap_folder_path)
-        duplicate_handler(file_path, file, mocap_folder_path, extension)
-        log_info(file, mocap_folder_path)
 
     elif extension == 'zip':
         organise_zip(file_path, destination_folder, file)
@@ -346,11 +324,11 @@ def organise(source_folder_flag, destination_folder, localtime_at_Start):
         file_path = os.path.join(source_folder, file)
         if os.path.isfile(file_path):
 
-            # yaha file ka time check karra agar program start hone se pehle koi file hogi toh uspe operation nai hoga
+            
             if os.path.getmtime(file_path) >= localtime_at_Start:
 
                 if os.path.isfile(file_path):
-                    # file ka extension extract karra hai
+                    
                     extension = file.split('.')[-1].lower()
 
                     organiser_utility(destination_folder,
