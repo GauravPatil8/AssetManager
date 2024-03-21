@@ -18,10 +18,11 @@ class OBJECT_PT_AssetManagerUI(bpy.types.Panel):
         # layout.separator()
 
         layout.label(text="Folder presets:")
+        layout.prop(scene, "folder_presets", text='')
         row_preset = layout.row()
-        row_preset.prop(scene, "folder_presets", text='')
-        row_preset.operator('ot.updateenum', text='', icon='FILE_REFRESH')
-        row_preset.operator('ot.installpreset', text='', icon='SORT_ASC')
+        row_preset.operator('ot.updateenum', text='Refresh', icon='FILE_REFRESH')
+        row_preset.operator('ot.installpreset', text='Install', icon='IMPORT')
+        row_preset.operator('ot.sharepreset', text='Share', icon='FOLDER_REDIRECT')
 
         layout.separator()
 
@@ -36,4 +37,4 @@ class OBJECT_PT_AssetManagerUI(bpy.types.Panel):
                             text_ctxt='Organise downloaded files')
 
         layout.separator()
-        layout.operator("object.log", text="Log")
+        layout.operator("object.log", text=" Transfer log")
