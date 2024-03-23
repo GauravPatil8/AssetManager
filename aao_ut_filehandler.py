@@ -60,7 +60,7 @@ def get_blendfile_folder():
 def return_projectfile_name():
     scene = bpy.context.scene
     
-    if scene.folder_presets!='default':
+    if scene.folder_presets!='DEFAULT':
         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
         with open(preset_path) as f:
             f_names=json.load(f)
@@ -125,10 +125,10 @@ def blender_folder_on_saved(dummy):
             blender_folder, project_folder_destination, os.path.basename(old_file_path))
         bpy.ops.wm.save_mainfile(filepath=new_file_path)
 
-        if os.path.exists(os.path.join(get_downloads_folder(), "Temp")):
-            for folder in os.listdir(os.path.join(get_downloads_folder(), "Temp")):
+        if os.path.exists(os.path.join(get_downloads_folder(), temporary_folder_name)):
+            for folder in os.listdir(os.path.join(get_downloads_folder(), temporary_folder_name)):
                 shutil.move(os.path.join(get_downloads_folder(),
-                            "Temp", folder), blender_folder)
+                            temporary_folder_name, folder), blender_folder)
         
         reload_image_textures(os.path.join(blender_folder,images_folder_destination))
         save_flag =True
@@ -251,7 +251,7 @@ def get_downloads_folder():
 def duplicate_handler(file_path, file, folder_path, extension):
     global filecount
     if os.path.exists(os.path.join(folder_path, file)):
-        new_file_name = file.split('.')[0]+'_'+str(filecount)
+        new_file_name = file.split('.')[0]+(f'({str(filecount)})')
         new_file_path = os.path.join(os.path.dirname(file_path), new_file_name+'.'+extension)
         os.rename(file_path, new_file_path)
         shutil.move(new_file_path, folder_path)
@@ -263,15 +263,13 @@ def duplicate_handler(file_path, file, folder_path, extension):
 def organiser_utility(destination_folder, extension, file_path, file):
 
     if extension in image_files:
-        images_folder_path = os.path.join(
-            destination_folder, images_folder_destination)
+        images_folder_path = os.path.join(destination_folder, images_folder_destination)
         create_folder(images_folder_path)
         duplicate_handler(file_path, file, images_folder_path, extension)
         log_info(file, images_folder_path)
 
     elif extension in project_files:
-        project_folder_path = os.path.join(
-            destination_folder, project_folder_destination)
+        project_folder_path = os.path.join(destination_folder, project_folder_destination)
         create_folder(project_folder_path)
         duplicate_handler(file_path, file, project_folder_path, extension)
         log_info(file, project_folder_path)
@@ -288,29 +286,25 @@ def organiser_utility(destination_folder, extension, file_path, file):
         os.remove(file_path)
 
     elif extension == 'hdr':
-        hdri_folder_path = os.path.join(
-            destination_folder, images_folder_destination, "HDRI_Images")
+        hdri_folder_path = os.path.join( destination_folder, images_folder_destination, "HDRI_Images")
         create_folder(hdri_folder_path)
         duplicate_handler(file_path, file, hdri_folder_path, extension)
         log_info(file, hdri_folder_path)
 
     elif extension in material_files:
-        material_folder_path = os.path.join(
-            destination_folder, project_folder_destination, material_folder_destination)
+        material_folder_path = os.path.join(destination_folder, project_folder_destination, material_folder_destination)
         create_folder(material_folder_path)
         duplicate_handler(file_path, file, material_folder_path, extension)
         log_info(file, material_folder_path)
 
     elif extension in video_files:
-        video_folder_path = os.path.join(
-            destination_folder, project_folder_destination, video_folder_destination)
+        video_folder_path = os.path.join(destination_folder, project_folder_destination, video_folder_destination)
         create_folder(video_folder_path)
         duplicate_handler(file_path, file, video_folder_path, extension)
         log_info(file, video_folder_path)
 
     elif extension in video_files:
-        audio_folder_path = os.path.join(
-            destination_folder, project_folder_destination, audio_folder_destination)
+        audio_folder_path = os.path.join(destination_folder, project_folder_destination, audio_folder_destination)
         create_folder(audio_folder_path)
         duplicate_handler(file_path, file, audio_folder_path, extension)
         log_info(file, audio_folder_path)
@@ -331,5 +325,4 @@ def organise(source_folder_flag, destination_folder, localtime_at_Start):
                     
                     extension = file.split('.')[-1].lower()
 
-                    organiser_utility(destination_folder,
-                                      extension, file_path, file)
+                    organiser_utility(destination_folder,extension, file_path, file)
