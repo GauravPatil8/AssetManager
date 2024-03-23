@@ -17,12 +17,12 @@ sys.path.append(package_path)
 
 loop_flag=True
 local_time_at_start = None
-blender_folder = None
+
 
 
 
 def get_blender_folder_path():
-    global blender_folder
+    
     global loop_flag
     blender_folder = get_blendfile_folder()
     project_file_name=return_projectfile_name()
@@ -30,6 +30,8 @@ def get_blender_folder_path():
         if os.path.basename(blender_folder)==project_file_name:
             loop_flag=False
         blender_folder = os.path.dirname(blender_folder)
+    loop_flag=True
+    return blender_folder
 
 def on_start(dummy):
     global local_time_at_start
@@ -61,8 +63,9 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
 
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
+                dest_blender_path=get_blender_folder_path()
                 threading.Thread(target=organise, daemon=True, args=(
-                    '0', blender_folder, local_time_at_start)).start()
+                    '0', dest_blender_path, local_time_at_start)).start()
 
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
@@ -74,8 +77,9 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
 
         else:
             if is_blend_file_saved():
+                dest_blender_path=get_blender_folder_path()
                 threading.Thread(target=organise, daemon=True, args=(
-                    '1', blender_folder, local_time_at_start)).start()
+                    '1', dest_blender_path, local_time_at_start)).start()
                 self.report({'INFO'}, "Organising Files")
 
             else:

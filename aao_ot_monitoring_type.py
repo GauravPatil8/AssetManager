@@ -8,15 +8,25 @@ from aao_ot_onclick_organise import is_blend_file_saved
 from aao_ot_onclick_organise import get_downloads_folder
 from aao_ot_onclick_organise import get_blendfile_folder
 from aao_ot_onclick_organise import create_folder
+from aao_ut_filehandler import return_projectfile_name
 from aao_ot_onclick_organise import local_time_at_start
-from aao_ot_onclick_organise import get_blender_folder_path
 report_flag=False
 loop_flag=True
 thread_flag = False
-blender_folder = None
+
 stop_event = threading.Event()
 
-
+def get_blender_folder_path():
+    
+    global loop_flag
+    blender_folder = get_blendfile_folder()
+    project_file_name=return_projectfile_name()
+    while loop_flag:
+        if os.path.basename(blender_folder)==project_file_name:
+            loop_flag=False
+        blender_folder = os.path.dirname(blender_folder)
+    loop_flag=True
+    return blender_folder
 
 def monitoring_type_prop_update_handler(self, context):
     global thread_flag
@@ -60,8 +70,9 @@ def realtime_monitoring(self, context, stop_event):
 
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
-                get_blender_folder_path()
-                organise('0', blender_folder, local_time_at_start)
+                dest_blender_folder=get_blender_folder_path()
+                print(dest_blender_folder)
+                organise('0', dest_blender_folder, local_time_at_start)
 
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
@@ -69,8 +80,8 @@ def realtime_monitoring(self, context, stop_event):
                 organise('0', temporary_folder, local_time_at_start)
         else:
             if is_blend_file_saved():
-                get_blender_folder_path()
-                organise('1', blender_folder, local_time_at_start)
+                dest_blender_folder=get_blender_folder_path()
+                organise('1', dest_blender_folder, local_time_at_start)
             else:
                 context.scene.monitor_folder = 'DOWNLOADS'
 
