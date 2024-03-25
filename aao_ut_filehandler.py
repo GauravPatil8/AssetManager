@@ -22,7 +22,7 @@ if not os.path.exists(file_folder_path):
     os.mkdir(file_folder_path)
 file_path = os.path.join(file_folder_path, "default.db")
 
-# temporary hai
+
 images_folder_destination = "Textures"
 project_folder_destination = "Project_Files"
 model_folder_destination = "Models"
@@ -47,6 +47,26 @@ video_files = ['mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', 'flv']
 audio_files = ['wav', 'mp3', 'flac', 'ogg', 'm3u', 'acc',
                'wma', 'wav', 'midi', 'aif', 'm4a', 'mpa', 'pls']
 
+def update_recent_file_path(old_path, new_path):
+    
+    config_directory = bpy.utils.user_resource('CONFIG')
+    recent_files_path = os.path.join(config_directory, "recent-files.txt")
+
+    
+    if os.path.exists(recent_files_path):
+        
+        with open(recent_files_path, "r") as file:
+            lines = file.readlines()
+
+        
+        modified_lines = [line.strip().replace(old_path, new_path) if old_path in line else line.strip() for line in lines]
+
+        
+        with open(recent_files_path, "w") as file:
+            file.write("\n".join(modified_lines))
+
+        
+   
 
 def get_blendfile_folder():
     bfp = bpy.data.filepath
@@ -117,20 +137,25 @@ def blender_folder_on_saved(dummy):
         
 
         old_file_path = bpy.data.filepath
-        bpy.ops.wm.open_mainfile(filepath=old_file_path)
+        
 
         shutil.move(bpy.data.filepath, new_blender_folder)
 
         new_file_path = os.path.join(
             blender_folder, project_folder_destination, os.path.basename(old_file_path))
+        
+        
+        
+        bpy.ops.wm.open_mainfile(filepath=new_file_path)
         bpy.ops.wm.save_mainfile(filepath=new_file_path)
 
         if os.path.exists(os.path.join(get_downloads_folder(), temporary_folder_name)):
             for folder in os.listdir(os.path.join(get_downloads_folder(), temporary_folder_name)):
                 shutil.move(os.path.join(get_downloads_folder(),
                             temporary_folder_name, folder), blender_folder)
-        
+                
         reload_image_textures(os.path.join(blender_folder,images_folder_destination))
+        update_recent_file_path(old_file_path,new_file_path)
         save_flag =True
 
 
