@@ -152,11 +152,13 @@ def blender_folder_on_saved(dummy):
         if os.path.exists(temporary_folder_path):
 
             for folder in os.listdir(temporary_folder_path):
-                current_folder=os.path.join(os.path.join(temporary_folder_path,folder))
+                transfer_dest=os.path.join(os.path.join(blender_folder,folder))
 
-                if os.path.exists(current_folder):
-                    for file in current_folder:
-                        shutil.move(os.path.join(current_folder,file),os.path.join(blender_folder,folder)) 
+                if os.path.exists(transfer_dest):
+                    current_folder=os.path.join(temporary_folder_path,folder)
+                    
+                    for downloads_file in os.listdir(current_folder):
+                        shutil.move(os.path.join(current_folder,downloads_file),transfer_dest) 
 
                 else:
                     shutil.move(os.path.join(temporary_folder_path, folder), blender_folder)

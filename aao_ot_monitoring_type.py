@@ -61,7 +61,7 @@ class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
     )
 
 
-def realtime_monitoring(self, context, stop_event):
+def realtime_monitoring(self, context, stop_event,destination_folder):
     global report_flag
     report_flag = True
     while not stop_event.is_set():
@@ -70,19 +70,16 @@ def realtime_monitoring(self, context, stop_event):
 
         if selected_folder == 'DOWNLOADS':
             if is_blend_file_saved():
-                dest_blender_folder=get_blender_folder_path()
-                print(dest_blender_folder)
-                organise('0', dest_blender_folder, local_time_at_start)
-
+                organise('0', destination_folder, local_time_at_start)
             else:
                 temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
                 create_folder(temporary_folder)
                 organise('0', temporary_folder, local_time_at_start)
         else:
             if is_blend_file_saved():
-                dest_blender_folder=get_blender_folder_path()
-                organise('1', dest_blender_folder, local_time_at_start)
+                organise('1', destination_folder, local_time_at_start)
             else:
+                self.report({'ERROR'}, "Blender file has not been saved. Please save your Blender file before utilizing this option.")
                 context.scene.monitor_folder = 'DOWNLOADS'
 
         if context.scene.delay_time_prop == 'THREE':
@@ -91,7 +88,6 @@ def realtime_monitoring(self, context, stop_event):
             time.sleep(7)
         else:
             time.sleep(10)
-
 
 class OBJECT_OT_monitor_type(bpy.types.Operator):
     bl_label = "Start"
@@ -110,11 +106,13 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
             if context.scene.monitor_folder != "DOWNLOADS":
                 if is_blend_file_saved():
                     self.report({'INFO'}, "Real-time monitoring has started")
+                    dest_blender_folder=get_blender_folder_path()
+
                     if thread_flag == False:
                         thread_flag = True
                         threading.Thread(target=realtime_monitoring, daemon=True, args=(
-                            self, context, stop_event)).start()
-                        self.report({'INFO'}, "Real-time monitoring has started")
+                            self, context, stop_event,dest_blender_folder)).start()
+                        self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder}")
                 else:
                     self.report(
                         {'ERROR'}, "Blender file has not been saved. Please save your Blender file before utilizing this option.")
@@ -122,7 +120,7 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
             else:
                 if thread_flag == False:
                     threading.Thread(target=realtime_monitoring, daemon=True, args=(
-                        self, context, stop_event)).start()
-                    self.report({'INFO'}, "Real-time monitoring has started")
+                        self, context, stop_event," ")).start()
+                    self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder}")
                     thread_flag = True
         return {'FINISHED'}

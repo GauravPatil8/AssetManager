@@ -39,9 +39,6 @@ from aao_ot_preset_creator   import OBJECT_PT_preset_creator
 from aao_pt_addonui          import OBJECT_PT_AssetManagerUI
 from aao_ot_onclick_organise import ENUM_PROPS_monitor_folder
 
-
-    
-
 classes = (ENUM_PROPS_monitor_folder,ENUM_PROPS_delay_time, ENUM_PROPS_Tags, ENUM_PROPS_monitoring_type, ENUM_PROPS_folder_presets, STRING_PROPS_preset_analysis_folder,
            OBJECT_OT_update_preset_list, OBJECT_OT_Install_preset,OBJECT_OT_share_preset,OBJECT_OT_Onclick_Organise, OBJECT_OT_save_preset, OBJECT_OT_log_popup, OBJECT_OT_log, OBJECT_OT_monitor_type, OPEN_FOLDER_OT_OpenFolder, OBJECT_PT_AssetManagerUI, OBJECT_PT_preset_creator)
 
@@ -51,11 +48,8 @@ def register():
     for kls in classes:
         bpy.utils.register_class(kls)
     bpy.types.Scene.enum_properties = bpy.props.CollectionProperty(type=ENUM_PROPS_Tags)
-    
-      
-    
-def unregister():
 
+def unregister():
     for kls in reversed(classes):
         bpy.utils.unregister_class(kls)
     del bpy.types.Scene.enum_properties
