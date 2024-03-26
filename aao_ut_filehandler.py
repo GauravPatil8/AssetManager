@@ -6,22 +6,20 @@ import json
 import sys
 from aao_ot_log import file_data
 
+def get_package_path():
+    script_path = os.path.abspath(__file__)
+    return os.path.dirname(script_path)
+
 
 blender_folder=''
 filecount = 0
 save_flag = False
-
-def get_package_path():
-    script_path = os.path.abspath(__file__)
-    return os.path.dirname(script_path)
 
 
 package_path = get_package_path()
 file_folder_path = os.path.join(package_path, "Presets")
 if not os.path.exists(file_folder_path):
     os.mkdir(file_folder_path)
-file_path = os.path.join(file_folder_path, "default.db")
-
 
 images_folder_destination = "Textures"
 project_folder_destination = "Project_Files"
@@ -149,10 +147,19 @@ def blender_folder_on_saved(dummy):
         bpy.ops.wm.open_mainfile(filepath=new_file_path)
         bpy.ops.wm.save_mainfile(filepath=new_file_path)
 
-        if os.path.exists(os.path.join(get_downloads_folder(), temporary_folder_name)):
-            for folder in os.listdir(os.path.join(get_downloads_folder(), temporary_folder_name)):
-                shutil.move(os.path.join(get_downloads_folder(),
-                            temporary_folder_name, folder), blender_folder)
+        temporary_folder_path=os.path.join(get_downloads_folder(), temporary_folder_name)
+        
+        if os.path.exists(temporary_folder_path):
+
+            for folder in os.listdir(temporary_folder_path):
+                current_folder=os.path.join(os.path.join(temporary_folder_path,folder))
+
+                if os.path.exists(current_folder):
+                    for file in current_folder:
+                        shutil.move(os.path.join(current_folder,file),os.path.join(blender_folder,folder)) 
+
+                else:
+                    shutil.move(os.path.join(temporary_folder_path, folder), blender_folder)
                 
         reload_image_textures(os.path.join(blender_folder,images_folder_destination))
         update_recent_file_path(old_file_path,new_file_path)
