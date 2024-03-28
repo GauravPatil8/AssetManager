@@ -36,7 +36,7 @@ model_files = ['obj', 'fbx', 'usdz', 'dae',
                'usd*', 'ply', 'glb', 'gltf', 'x3d','ztl','stl','abc']
 
 image_files = ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp',
-               'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif','avif']
+               'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif','avif','hdr']
 
 material_files = ['sbsar', 'spsm', 'spp', 'sbs']
 
@@ -319,12 +319,6 @@ def organiser_utility(destination_folder, extension, file_path, file):
         organise_zip(file_path, destination_folder, file)
         os.remove(file_path)
 
-    elif extension == 'hdr':
-        hdri_folder_path = os.path.join( destination_folder, images_folder_destination, "HDRI_Images")
-        create_folder(hdri_folder_path)
-        duplicate_handler(file_path, file, hdri_folder_path, extension)
-        log_info(file, hdri_folder_path)
-
     elif extension in material_files:
         material_folder_path = os.path.join(destination_folder, project_folder_destination, material_folder_destination)
         create_folder(material_folder_path)
@@ -337,7 +331,7 @@ def organiser_utility(destination_folder, extension, file_path, file):
         duplicate_handler(file_path, file, video_folder_path, extension)
         log_info(file, video_folder_path)
 
-    elif extension in video_files:
+    elif extension in audio_files:
         audio_folder_path = os.path.join(destination_folder, project_folder_destination, audio_folder_destination)
         create_folder(audio_folder_path)
         duplicate_handler(file_path, file, audio_folder_path, extension)
