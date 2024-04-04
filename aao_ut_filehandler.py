@@ -228,8 +228,10 @@ def organise_zip(zip_file_path, destination_folder, file_name):
     flag_dictionary={'model_flag': False,'Video_flag':False,'Audio_flag':False,'image_flag':False}
 
     combined_list = model_files + project_files
+    now = datetime.datetime.now()
+    formatted_date = now.strftime("%Y_%m_%d_%H_%M_%S")
 
-    subdirectory_name = os.path.splitext(os.path.basename(zip_file_path))[0]+' '+str(datetime.datetime.now())
+    subdirectory_name = os.path.splitext(os.path.basename(zip_file_path))[0]+' '+formatted_date
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
         file_names = zip_ref.namelist()
 
