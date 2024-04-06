@@ -11,9 +11,6 @@ import os
 import time
 import threading
 
-script_path = os.path.abspath(__file__)
-package_path = os.path.dirname(script_path)
-sys.path.append(package_path)
 
 loop_flag=True
 local_time_at_start = None
