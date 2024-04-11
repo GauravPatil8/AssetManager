@@ -257,5 +257,11 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
                 new_row.prop(enum_property, "tag", text="")
             layout.prop(context.scene, 'preset_name', text="Enter preset name")
             layout.operator('object.savepreset', text='Save Preset')
+        box=layout.box()
+        box.prop(context.scene,'default_config')
+        if context.scene.default_config:
+            box.label(text='Zip extraction mode:')
+            box.prop(context.scene,'zip_extraction',text='')
+            box.operator('ot.savedefaultconfigs',text='Save configuration')
         
            

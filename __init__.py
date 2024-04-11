@@ -48,11 +48,10 @@ from aao_ot_onclick_organise import STRING_PROPS_folder_path
 from aao_ot_onclick_organise import STRING_PROPS_destination_path
 from aao_config_panel        import BOOL_PROPS_defaults
 from aao_config_panel        import ENUM_Zip_extract
-from aao_config_panel        import OBJECT_PT_configure
 from aao_config_panel        import OBJECT_OT_Save_configs
 
 classes = (ENUM_PROPS_monitor_folder,ENUM_PROPS_delay_time, ENUM_PROPS_Tags, ENUM_PROPS_monitoring_type, ENUM_PROPS_folder_presets, STRING_PROPS_preset_analysis_folder,STRING_PROPS_folder_path,STRING_PROPS_destination_path,BOOL_PROPS_defaults,ENUM_Zip_extract,OBJECT_OT_monitoringfolder,OBJECT_OT_destinationfolder,
-           OBJECT_OT_update_preset_list, OBJECT_OT_Install_preset,OBJECT_OT_share_preset,OBJECT_OT_remove_preset,OBJECT_OT_Onclick_Organise, OBJECT_OT_save_preset, OBJECT_OT_log_popup, OBJECT_OT_log, OBJECT_OT_monitor_type,OBJECT_OT_Save_configs, OPEN_FOLDER_OT_OpenFolder, OBJECT_PT_AssetManagerUI, OBJECT_PT_preset_creator,OBJECT_PT_configure)
+           OBJECT_OT_update_preset_list, OBJECT_OT_Install_preset,OBJECT_OT_share_preset,OBJECT_OT_remove_preset,OBJECT_OT_Onclick_Organise, OBJECT_OT_save_preset, OBJECT_OT_log_popup, OBJECT_OT_log, OBJECT_OT_monitor_type,OBJECT_OT_Save_configs, OPEN_FOLDER_OT_OpenFolder, OBJECT_PT_AssetManagerUI, OBJECT_PT_preset_creator)
 
 def register():
     
