@@ -5,6 +5,8 @@ from bpy.types import Context, Operator
 from bpy.props import StringProperty
 from aao_ut_filehandler import get_package_path
 from aao_ut_filehandler import path_constructor
+from aao_ut_filehandler import default_setter
+
 
 preset_folder_name="Presets"
 subdirectories_relpath_dict = {}
@@ -82,6 +84,7 @@ class ENUM_PROPS_Tags(bpy.types.PropertyGroup):
 class OBJECT_OT_update_preset_list(Operator):
     bl_idname = 'ot.updateenum'
     bl_label = 'update'
+    bl_description='Update Preset List'
 
     def execute(self, context):
         global preset_list
@@ -95,7 +98,7 @@ class OBJECT_OT_update_preset_list(Operator):
         bpy.types.Scene.folder_presets = bpy.props.EnumProperty(
             items=preset_list,
             description="Select a folder structure",
-            default='DEFAULT',
+            default=default_setter('preset','DEFAULT'),
         )
         return {'FINISHED'}
 
@@ -175,7 +178,7 @@ class ENUM_PROPS_folder_presets(bpy.types.PropertyGroup):
     bpy.types.Scene.folder_presets = bpy.props.EnumProperty(
         items=preset_list,
         description="Select a folder structure",
-        default='DEFAULT',
+        default=default_setter('preset','DEFAULT'),
         update=update_folder_path
     )
 
@@ -254,3 +257,5 @@ class OBJECT_PT_preset_creator(bpy.types.Panel):
                 new_row.prop(enum_property, "tag", text="")
             layout.prop(context.scene, 'preset_name', text="Enter preset name")
             layout.operator('object.savepreset', text='Save Preset')
+        
+           

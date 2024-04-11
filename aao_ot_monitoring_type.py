@@ -6,6 +6,7 @@ from aao_ut_filehandler import organise
 from aao_ot_onclick_organise import get_downloads_folder
 from aao_ot_onclick_organise import get_blendfile_folder
 from aao_ut_filehandler import return_projectfile_name
+from aao_ut_filehandler  import default_setter
 from aao_ot_onclick_organise import local_time_at_start
 report_flag=False
 loop_flag=True
@@ -42,9 +43,10 @@ class ENUM_PROPS_monitoring_type(bpy.types.PropertyGroup):
             ('REALTIME', 'Real-time', 'Organises folder in real-time'),
             ('ONCLICKOPERATOR', 'On-click', 'Organises folder on click'),
         ],
-        default='ONCLICKOPERATOR',
+        default=default_setter('M_type','ONCLICKOPERATOR'),
         update=monitoring_type_prop_update_handler,
     )
+    
 
 
 class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
@@ -54,7 +56,7 @@ class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
             ('THREE', '3 Seconds', 'Orgnises folder after every three seconds'),
             ('SEVEN', '7 Seconds', 'Orgnises folder after every seven seconds')
         ],
-        default='ONE',
+        default=default_setter('R_time','THREE'),
     )
 
 
@@ -104,7 +106,7 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
                         thread_flag = True
                         threading.Thread(target=realtime_monitoring, daemon=True, args=(
                             self, context, stop_event,get_downloads_folder(),destination_path_realtime)).start()
-                        self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder.label}")
+                        self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder}")
                 else:
                     self.report({'ERROR'}, "Select a destination folder.")
             else:
@@ -113,7 +115,7 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
                         if destination_path_realtime!='':
                             threading.Thread(target=realtime_monitoring, daemon=True, args=(
                                 self, context, stop_event,folder_path_realtime,destination_path_realtime)).start()
-                            self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder.label}")
+                            self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder}")
                             thread_flag = True
                         else:
                             self.report({'ERROR'}, "Select a destination folder.")

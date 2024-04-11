@@ -44,7 +44,13 @@ video_files = ['mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', 'flv']
 audio_files = ['wav', 'mp3', 'flac', 'ogg', 'm3u', 'acc','wma', 'wav', 'midi', 'aif', 'm4a', 'mpa', 'pls']
 
 fType_dict={}
-
+def default_setter(key,default):
+    json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
+    if os.path.exists(json_file_name):
+        with open(json_file_name) as f:
+            configs=json.load(f)
+        return configs.get(key,default)
+    return default
 def dictionary_constructor():
     '''
     name               index
