@@ -41,8 +41,10 @@ class OBJECT_OT_Save_configs(bpy.types.Operator):
             config_dict['R_time']=context.scene.delay_time_prop
         else:
             config_dict['R_time']=None
-        if context.scene.zip_extraction==True:
+        if context.scene.zip_extraction=='SEP':
             config_dict['zip_mode']=True
+        else:
+            config_dict['zip_mode']=False
         
         json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
         create_folder(os.path.join(package_path,'addon_configuration'))
