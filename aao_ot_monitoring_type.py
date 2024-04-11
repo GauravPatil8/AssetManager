@@ -3,11 +3,8 @@ import os
 import time
 import threading
 from aao_ut_filehandler import organise
-from aao_ut_filehandler import temporary_folder_name
-from aao_ot_onclick_organise import is_blend_file_saved
 from aao_ot_onclick_organise import get_downloads_folder
 from aao_ot_onclick_organise import get_blendfile_folder
-from aao_ot_onclick_organise import create_folder
 from aao_ut_filehandler import return_projectfile_name
 from aao_ot_onclick_organise import local_time_at_start
 report_flag=False
@@ -53,40 +50,36 @@ class ENUM_PROPS_monitoring_type(bpy.types.PropertyGroup):
 class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
     bpy.types.Scene.delay_time_prop = bpy.props.EnumProperty(
         items=[
-            ('THREE', '3 Seconds', 'Orgnises folder every three seconds'),
-            ('SEVEN', '7 Seconds', 'Orgnises folder every seven seconds'),
-            ('THREE', '10 Seconds', 'Orgnises folder every ten seconds')
+            ('ONE', '1 Seconds', 'Orgnises folder after every one seconds'),
+            ('THREE', '3 Seconds', 'Orgnises folder after every three seconds'),
+            ('SEVEN', '7 Seconds', 'Orgnises folder after every seven seconds')
         ],
-        default='THREE',
+        default='ONE',
     )
 
 
-def realtime_monitoring(self, context, stop_event,destination_folder):
+def realtime_monitoring(self, context, stop_event,monitoring_folder,destination_folder):
     global report_flag
     report_flag = True
     while not stop_event.is_set():
         selected_folder = context.scene.monitor_folder
-        temporary_folder = None  # Define temporary_folder outside the if block
 
         if selected_folder == 'DOWNLOADS':
-            if is_blend_file_saved():
-                organise('0', destination_folder, local_time_at_start)
-            else:
-                temporary_folder = os.path.join(get_downloads_folder(), temporary_folder_name)
-                create_folder(temporary_folder)
-                organise('0', temporary_folder, local_time_at_start)
+            if destination_folder!='':
+                organise(get_downloads_folder(), destination_folder, local_time_at_start)
         else:
-            if is_blend_file_saved():
-                organise('1', destination_folder, local_time_at_start)
+            if monitoring_folder!='':
+                if destination_folder!='':
+                    organise(monitoring_folder, destination_folder, local_time_at_start)
             else:
                 context.scene.monitor_folder = 'DOWNLOADS'
 
-        if context.scene.delay_time_prop == 'THREE':
+        if context.scene.delay_time_prop == 'ONE':
+            time.sleep(1)
+        elif context.scene.delay_time_prop == 'THREE':
             time.sleep(3)
-        elif context.scene.delay_time_prop == 'SEVEN':
-            time.sleep(7)
         else:
-            time.sleep(10)
+            time.sleep(7)
 
 class OBJECT_OT_monitor_type(bpy.types.Operator):
     bl_label = "Start"
@@ -98,28 +91,33 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
         global stop_event
         global report_flag
         stop_event.clear()
-
+        folder_path_realtime=context.scene.folder_path
+        destination_path_realtime=context.scene.destination_path
         if report_flag==True:
             self.report({'WARNING'},f"Real-time monitoring has already started,currently monitoring {context.scene.monitor_folder}")
         else:
-            if context.scene.monitor_folder != "DOWNLOADS":
-                if is_blend_file_saved():
+            if context.scene.monitor_folder == "DOWNLOADS":
+                if destination_path_realtime!='':
                     self.report({'INFO'}, "Real-time monitoring has started")
-                    dest_blender_folder=get_blender_folder_path()
-
+            
                     if thread_flag == False:
                         thread_flag = True
                         threading.Thread(target=realtime_monitoring, daemon=True, args=(
-                            self, context, stop_event,dest_blender_folder)).start()
+                            self, context, stop_event,get_downloads_folder(),destination_path_realtime)).start()
                         self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder.label}")
                 else:
-                    self.report(
-                        {'ERROR'}, "Blender file has not been saved. Please save your Blender file before utilizing this option.")
-                    context.scene.monitor_folder = "DOWNLOADS"
+                    self.report({'ERROR'}, "Select a destination folder.")
             else:
                 if thread_flag == False:
-                    threading.Thread(target=realtime_monitoring, daemon=True, args=(
-                        self, context, stop_event," ")).start()
-                    self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder}")
-                    thread_flag = True
+                    if folder_path_realtime!='':
+                        if destination_path_realtime!='':
+                            threading.Thread(target=realtime_monitoring, daemon=True, args=(
+                                self, context, stop_event,folder_path_realtime,destination_path_realtime)).start()
+                            self.report({'INFO'}, f"Real-time monitoring has started,currently monitoring {context.scene.monitor_folder.label}")
+                            thread_flag = True
+                        else:
+                            self.report({'ERROR'}, "Select a destination folder.")
+                    else:
+                        self.report({'ERROR'}, "Select a folder to monitor.")
+                        context.scene.monitor_folder='DOWNLOADS'
         return {'FINISHED'}

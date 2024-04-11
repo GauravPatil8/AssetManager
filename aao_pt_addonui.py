@@ -12,17 +12,27 @@ class OBJECT_PT_AssetManagerUI(bpy.types.Panel):
         layout = self.layout
         scene = context.scene
 
-        layout.label(text="Select folder to monitor:")
-        layout.prop(scene, "monitor_folder", text="")
-
-        # layout.separator()
-
-        layout.label(text="Folder presets:")
+        layout.label(text="Presets:")
         layout.prop(scene, "folder_presets", text='')
         row_preset = layout.row()
         row_preset.operator('ot.updateenum', text='Refresh', icon='FILE_REFRESH')
         row_preset.operator('ot.installpreset', text='Install', icon='IMPORT')
         row_preset.operator('ot.sharepreset', text='Share', icon='FOLDER_REDIRECT')
+        row_preset.operator('ot.removepreset', text='Remove', icon='TRASH')
+
+        box=layout.box()
+
+        box.label(text="Select folder to monitor:")
+        box.prop(scene, "monitor_folder", text="")
+        
+        if scene.monitor_folder!='DOWNLOADS':
+            row=box.row()
+            row.prop(scene,'folder_path',icon='FILE_FOLDER')
+            row.operator('ot.foldertomonitor',text='',icon='FILE_FOLDER')
+        box.label(text='Choose Destination Folder:')
+        row=box.row()
+        row.prop(scene,'destination_path',icon='FILE_FOLDER')
+        row.operator('ot.foldertostore',text='',icon='FILE_FOLDER')
 
         layout.separator()
 

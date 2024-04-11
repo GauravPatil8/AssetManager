@@ -42,3 +42,15 @@ class OBJECT_OT_share_preset(bpy.types.Operator):
     def invoke(self, context, event):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
+    
+class OBJECT_OT_remove_preset(bpy.types.Operator):
+    bl_label="Remove Preset"
+    bl_idname="ot.removepreset"
+    bl_description="remove any preset from local device."
+
+    def execute(self, context):
+        preset_basename=context.scene.folder_presets
+        os.remove(os.path.join(preset_destination_path,preset_basename+'.json')) 
+        context.scene.folder_presets='DEFAULT'
+        return {'FINISHED'}
+   

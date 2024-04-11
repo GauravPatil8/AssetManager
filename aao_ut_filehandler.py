@@ -304,15 +304,7 @@ def create_folder(folder_path):
         os.makedirs(folder_path)
 
 def get_downloads_folder():
-
-    if os.name == 'nt':
-        return os.path.join(os.path.expanduser('~'), 'Downloads')
-
-    elif sys.platform == 'darwin':
-        return os.path.join(os.path.expanduser('~'), 'Downloads')
-
-    else:
-        return os.path.join(os.path.expanduser('~'), 'Downloads')
+    return os.path.join(os.path.expanduser('~'), 'Downloads')
 
 def duplicate_handler(file_path, file, folder_path, extension):
     global filecount
@@ -337,8 +329,8 @@ def organiser_utility(destination_folder, extension, file_path, file):
         organise_zip(file_path, destination_folder, file)
         os.remove(file_path)
 
-def organise(source_folder_flag, destination_folder, localtime_at_Start):
-    source_folder=get_source_folder(source_folder_flag)
+def organise(source_folder, destination_folder, localtime_at_Start):
+    
     for file in os.listdir(source_folder):
                                 
         file_path = os.path.join(source_folder, file)

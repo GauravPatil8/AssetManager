@@ -195,14 +195,18 @@ class OBJECT_OT_save_preset(bpy.types.Operator):
                 subdir_keys = list(subdirectories_relpath_dict.keys())
 
                 for i, enum_property in enumerate(context.scene.enum_properties):
-                    if enum_property.name != subdir_keys[i]:
-                        path = subdirectories_relpath_dict[subdir_keys[i]]
-                        base_dir = os.path.dirname(path)
-                        final_path = os.path.join(base_dir, enum_property.name)
-                        json_data[enum_property.tag] = final_path
+                    lensubdir=len(subdir_keys)
+                    if i<lensubdir:
+                        if enum_property.name != subdir_keys[i]:
+                            path = subdirectories_relpath_dict[subdir_keys[i]]
+                            base_dir = os.path.dirname(path)
+                            final_path = os.path.join(base_dir, enum_property.name)
+                            json_data[enum_property.tag] = final_path
+                        else:
+                            path = subdirectories_relpath_dict[subdir_keys[i]]
+                            json_data[enum_property.tag] = path
                     else:
-                        path = subdirectories_relpath_dict[subdir_keys[i]]
-                        json_data[enum_property.tag] = path
+                        break
 
                     json_preset_path = os.path.join(
                         package_path, preset_folder_name, context.scene.preset_name+'.json')
