@@ -57,7 +57,7 @@ def get_subdirectories(directory):
         item_path = os.path.join(directory, item)
 
         if os.path.isdir(item_path):
-            base_folder_name = os.path.basename(item_path)
+            base_folder_name = os.path.join('~',os.path.basename(os.path.dirname(item_path)),os.path.basename(item_path))
             subdirectories.append(base_folder_name)
             subdirectories_relpath_dict[base_folder_name] = os.path.relpath(
                 item_path, selected_folder_path)

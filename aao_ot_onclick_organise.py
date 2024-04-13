@@ -14,8 +14,8 @@ import json
 ##Global Variables###
 loop_flag=True
 local_time_at_start = None
-folder_paths=''
-destination_paths=''
+folder_paths=default_setter('M_folder','')
+destination_paths=default_setter('D_folder','')
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
 ###

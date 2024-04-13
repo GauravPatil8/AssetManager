@@ -1,7 +1,7 @@
 import bpy
 import os
 import json
-from aao_ut_filehandler import create_folder
+from aao_ut_filehandler import create_folder,default_setter
 
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
@@ -18,7 +18,7 @@ class ENUM_Zip_extract(bpy.types.PropertyGroup):
             ('SEP', 'Separate Assets', 'This option organizes all assets into their respective folders during the extraction of a zipfile.'),
             ('NOSEP', 'Predominant Asset Type', 'This option extracts a Zipfile into a specific folder based on the predominant type of asset it contains. For instance, if the Zipfile contains a significant number of video files, it will be extracted into the video files folder.'),
         ],
-        default="SEP"
+        default=default_setter('zip_enum','NOSEP')
     )# type: ignore
 
 class OBJECT_OT_Save_configs(bpy.types.Operator):
@@ -42,9 +42,11 @@ class OBJECT_OT_Save_configs(bpy.types.Operator):
         else:
             config_dict['R_time']=None
         if context.scene.zip_extraction=='SEP':
+            config_dict['zip_enum']='SEP'
             config_dict['zip_mode']=True
         else:
             config_dict['zip_mode']=False
+            config_dict['zip_enum']='NOSEP'
         
         json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
         create_folder(os.path.join(package_path,'addon_configuration'))

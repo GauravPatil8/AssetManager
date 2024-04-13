@@ -1,8 +1,5 @@
 #Copyright (c) 2024 Gaurav 
 
-# MODULE_NAME="asset organiser"
-# ADDON_NAME="asset organiser"
-
 # bl_info = {
 #     "name": "Realtime Asset Organiser",
 #     "blender": (4, 1, 0),

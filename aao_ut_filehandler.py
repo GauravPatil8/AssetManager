@@ -3,7 +3,6 @@ import shutil
 import bpy
 import zipfile
 import json
-import sys
 import datetime
 from aao_ot_log import file_data
 
@@ -44,6 +43,7 @@ video_files = ['mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', 'flv']
 audio_files = ['wav', 'mp3', 'flac', 'ogg', 'm3u', 'acc','wma', 'wav', 'midi', 'aif', 'm4a', 'mpa', 'pls']
 
 fType_dict={}
+
 def default_setter(key,default):
     json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
     if os.path.exists(json_file_name):
@@ -51,51 +51,51 @@ def default_setter(key,default):
             configs=json.load(f)
         return configs.get(key,default)
     return default
+
 def dictionary_constructor():
     '''
-    name               index
+    name             |  index
     -------------------------
-    project_files      : 0 
-    model_files        : 1   
-    image_files        : 2  
-    material_files     : 3
-    video_files        : 4
-    audio_files        : 5
+    model_files      |   0   
+    image_files      |   1  
+    material_files   |   2
+    video_files      |   3
+    audio_files      |   4
     
     '''
     global fType_dict
-    fType_list=[project_files,model_files,image_files,material_files,video_files,audio_files]
-    fType_names=[project_folder_destination,model_folder_destination,images_folder_destination,material_folder_destination,video_folder_destination,audio_folder_destination]
+    fType_list=[project_files+model_files,image_files,material_files,video_files,audio_files]
+    fType_names=[model_folder_destination,images_folder_destination,material_folder_destination,video_folder_destination,audio_folder_destination]
     
     for index,extension_list in enumerate(fType_list):
         fType_dict[tuple(extension_list)]= fType_names[index]
 
 dictionary_constructor()
-def update_recent_file_path(old_path, new_path):
+# def update_recent_file_path(old_path, new_path):
     
-    config_directory = bpy.utils.user_resource('CONFIG')
-    recent_files_path = os.path.join(config_directory, "recent-files.txt")
+#     config_directory = bpy.utils.user_resource('CONFIG')
+#     recent_files_path = os.path.join(config_directory, "recent-files.txt")
 
     
-    if os.path.exists(recent_files_path):
+#     if os.path.exists(recent_files_path):
         
-        with open(recent_files_path, "r") as file:
-            lines = file.readlines()
-
-        
-        modified_lines = [line.strip().replace(old_path, new_path) if old_path in line else line.strip() for line in lines]
+#         with open(recent_files_path, "r") as file:
+#             lines = file.readlines()
 
         
-        with open(recent_files_path, "w") as file:
-            file.write("\n".join(modified_lines))
+#         modified_lines = [line.strip().replace(old_path, new_path) if old_path in line else line.strip() for line in lines]
+
+        
+#         with open(recent_files_path, "w") as file:
+#             file.write("\n".join(modified_lines))
 
 
-def get_blendfile_folder():
-    bfp = bpy.data.filepath
-    if bfp:
-        return bpy.path.abspath("//")
-    else:
-        return None
+# def get_blendfile_folder():
+#     bfp = bpy.data.filepath
+#     if bfp:
+#         return bpy.path.abspath("//")
+#     else:
+#         return None
 
 def return_projectfile_name():
     scene = bpy.context.scene
@@ -113,7 +113,6 @@ def path_constructor():
     global images_folder_destination 
     global project_folder_destination 
     global model_folder_destination 
-    global mocap_folder_destination 
     global material_folder_destination 
     global video_folder_destination 
     global audio_folder_destination 
@@ -144,90 +143,89 @@ def path_constructor():
     dictionary_constructor()
     
         
-def blender_folder_on_saved(dummy):
-    global save_flag
-    global blender_folder
+# def blender_folder_on_saved(dummy):
+#     global save_flag
+#     global blender_folder
 
-    blender_folder = get_blendfile_folder()
-    if save_flag == False:
+#     blender_folder = get_blendfile_folder()
+#     if save_flag == False:
 
-        blender_folder = get_blendfile_folder()
-        new_blender_folder = os.path.join(blender_folder, project_folder_destination)
-        if not os.path.exists(new_blender_folder):
-            os.makedirs(new_blender_folder)
+#         blender_folder = get_blendfile_folder()
+#         new_blender_folder = os.path.join(blender_folder, project_folder_destination)
+#         if not os.path.exists(new_blender_folder):
+#             os.makedirs(new_blender_folder)
         
 
-        old_file_path = bpy.data.filepath
+#         old_file_path = bpy.data.filepath
         
 
-        shutil.move(bpy.data.filepath, new_blender_folder)
+#         shutil.move(bpy.data.filepath, new_blender_folder)
 
-        new_file_path = os.path.join(
-            blender_folder, project_folder_destination, os.path.basename(old_file_path))
+#         new_file_path = os.path.join(
+#             blender_folder, project_folder_destination, os.path.basename(old_file_path))
         
         
         
-        bpy.ops.wm.open_mainfile(filepath=new_file_path)
-        bpy.ops.wm.save_mainfile(filepath=new_file_path)
+#         bpy.ops.wm.open_mainfile(filepath=new_file_path)
+#         bpy.ops.wm.save_mainfile(filepath=new_file_path)
 
-        temporary_folder_path=os.path.join(get_downloads_folder(), temporary_folder_name)
+#         temporary_folder_path=os.path.join(get_downloads_folder(), temporary_folder_name)
         
-        if os.path.exists(temporary_folder_path):
+#         if os.path.exists(temporary_folder_path):
 
-            for folder in os.listdir(temporary_folder_path):
-                transfer_dest=os.path.join(os.path.join(blender_folder,folder))
+#             for folder in os.listdir(temporary_folder_path):
+#                 transfer_dest=os.path.join(os.path.join(blender_folder,folder))
 
-                if os.path.exists(transfer_dest):
-                    current_folder=os.path.join(temporary_folder_path,folder)
+#                 if os.path.exists(transfer_dest):
+#                     current_folder=os.path.join(temporary_folder_path,folder)
                     
-                    for downloads_file in os.listdir(current_folder):
-                        shutil.move(os.path.join(current_folder,downloads_file),transfer_dest) 
+#                     for downloads_file in os.listdir(current_folder):
+#                         shutil.move(os.path.join(current_folder,downloads_file),transfer_dest) 
 
-                else:
-                    shutil.move(os.path.join(temporary_folder_path, folder), blender_folder)
+#                 else:
+#                     shutil.move(os.path.join(temporary_folder_path, folder), blender_folder)
                 
-        reload_image_textures(os.path.join(blender_folder,images_folder_destination))
-        update_recent_file_path(old_file_path,new_file_path)
-        save_flag =True
+#         reload_image_textures(os.path.join(blender_folder,images_folder_destination))
+#         update_recent_file_path(old_file_path,new_file_path)
+#         save_flag =True
 
 def log_info(file_name, file_path):
     info_list = [file_name, file_path]
     log_tuple = tuple(info_list)
     file_data.append(log_tuple)
 
-def is_blend_file_saved():
-    if bpy.data.filepath == "":
-        return False
-    else:
-        return True
+# def is_blend_file_saved():
+#     if bpy.data.filepath == "":
+#         return False
+#     else:
+#         return True
 
-def get_source_folder(flag):
-    if flag == '0':
-        return get_downloads_folder()
-    else:
+# def get_source_folder(flag):
+#     if flag == '0':
+#         return get_downloads_folder()
+#     else:
 
-        path = get_blendfile_folder()
-        newpath_1 = os.path.dirname(path)
-        newpath_2 = os.path.dirname(newpath_1)
-        return newpath_2
+#         path = get_blendfile_folder()
+#         newpath_1 = os.path.dirname(path)
+#         newpath_2 = os.path.dirname(newpath_1)
+#         return newpath_2
 
-def reload_image_textures(target_folder):
-    for material in bpy.data.materials:
-        if material.node_tree:
-            for node in material.node_tree.nodes:
-                if node.type == 'TEX_IMAGE':
-                    image_texture = node.image
-                    if image_texture:
+# def reload_image_textures(target_folder):
+#     for material in bpy.data.materials:
+#         if material.node_tree:
+#             for node in material.node_tree.nodes:
+#                 if node.type == 'TEX_IMAGE':
+#                     image_texture = node.image
+#                     if image_texture:
                         
-                        if image_texture.filepath:
+#                         if image_texture.filepath:
                             
-                            filename = os.path.basename(image_texture.filepath)
-                            new_filepath = os.path.join(target_folder, filename)
-                            image_texture.filepath = bpy.path.abspath(new_filepath)
-                            image_texture.reload()
+#                             filename = os.path.basename(image_texture.filepath)
+#                             new_filepath = os.path.join(target_folder, filename)
+#                             image_texture.filepath = bpy.path.abspath(new_filepath)
+#                             image_texture.reload()
                             
 def organise_zip(zip_file_path, destination_folder, file_name):
-    
     video_count=0
     audio_count=0
     image_count=0
@@ -235,7 +233,7 @@ def organise_zip(zip_file_path, destination_folder, file_name):
 
     combined_list = model_files + project_files
     now = datetime.datetime.now()
-    formatted_date = now.strftime("%Y_%m_%d_%H_%M_%S")
+    formatted_date = now.strftime("%Y-%m-%d-%H-%M-%S")
 
     subdirectory_name = os.path.splitext(os.path.basename(zip_file_path))[0]+' '+formatted_date
     with zipfile.ZipFile(zip_file_path, 'r') as zip_ref:
@@ -324,6 +322,7 @@ def duplicate_handler(file_path, file, folder_path, extension):
     filecount += 1
 
 def organiser_utility(destination_folder, extension, file_path, file):
+    extracted_flag=False
     if extension!='zip':
         for key in fType_dict.keys():
             if extension in key:
@@ -332,7 +331,28 @@ def organiser_utility(destination_folder, extension, file_path, file):
                 duplicate_handler(file_path, file, folder_path, extension)
                 log_info(file, folder_path)
     else:
-        organise_zip(file_path, destination_folder, file)
+        json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
+        if not extracted_flag:
+            if os.path.exists(json_file_name):
+                with open(json_file_name) as f:
+                    configs=json.load(f)
+                if not configs.get('zip_mode'):
+                    organise_zip(file_path, destination_folder, file)
+                else:
+                    with zipfile.ZipFile(file_path, 'r') as zip_ref:
+                        file_names=zip_ref.namelist()
+                        for files in file_names:
+                            now = datetime.datetime.now()
+                            formatted_date = now.strftime("%Y-%m-%d-%H-%M-%S")
+                            extension_inzip=files.split('.')[-1].lower()
+                            for keyforzip in fType_dict.keys():
+                                if extension_inzip in keyforzip:
+                                    output_dir=os.path.join(destination_folder,fType_dict[keyforzip],file.split('.')[0]+' '+formatted_date)
+                                    log_info(os.path.basename(files),output_dir)
+                                    create_folder(output_dir)
+                                    zip_ref.extract(files, output_dir)                        
+        else:
+            organise_zip(file_path, destination_folder, file)
         os.remove(file_path)
 
 def organise(source_folder, destination_folder, localtime_at_Start):
@@ -342,7 +362,6 @@ def organise(source_folder, destination_folder, localtime_at_Start):
         file_path = os.path.join(source_folder, file)
         if os.path.isfile(file_path):
 
-            
             if os.path.getmtime(file_path) >= localtime_at_Start:
 
                 if os.path.isfile(file_path):
