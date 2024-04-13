@@ -4,7 +4,6 @@ import time
 import threading
 from aao_ut_filehandler import organise
 from aao_ot_onclick_organise import get_downloads_folder
-from aao_ot_onclick_organise import get_blendfile_folder
 from aao_ut_filehandler import return_projectfile_name
 from aao_ut_filehandler  import default_setter
 from aao_ot_onclick_organise import local_time_at_start
@@ -14,17 +13,17 @@ thread_flag = False
 
 stop_event = threading.Event()
 
-def get_blender_folder_path():
+# def get_blender_folder_path():
     
-    global loop_flag
-    blender_folder = get_blendfile_folder()
-    project_file_name=return_projectfile_name()
-    while loop_flag:
-        if os.path.basename(blender_folder)==project_file_name:
-            loop_flag=False
-        blender_folder = os.path.dirname(blender_folder)
-    loop_flag=True
-    return blender_folder
+#     global loop_flag
+#     blender_folder = get_blendfile_folder()
+#     project_file_name=return_projectfile_name()
+#     while loop_flag:
+#         if os.path.basename(blender_folder)==project_file_name:
+#             loop_flag=False
+#         blender_folder = os.path.dirname(blender_folder)
+#     loop_flag=True
+#     return blender_folder
 
 def monitoring_type_prop_update_handler(self, context):
     global thread_flag
@@ -67,8 +66,8 @@ def realtime_monitoring(self, context, stop_event,monitoring_folder,destination_
         selected_folder = context.scene.monitor_folder
 
         if selected_folder == 'DOWNLOADS':
-            if destination_folder!='':
-                organise(get_downloads_folder(), destination_folder, local_time_at_start)
+            if context.scene.destination_path!='':
+                organise(get_downloads_folder(), context.scene.destination_path, local_time_at_start)
         else:
             if monitoring_folder!='':
                 if destination_folder!='':

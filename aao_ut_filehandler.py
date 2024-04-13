@@ -312,14 +312,18 @@ def get_downloads_folder():
 
 def duplicate_handler(file_path, file, folder_path, extension):
     global filecount
-    if os.path.exists(os.path.join(folder_path, file)):
-        new_file_name = file.split('.')[0]+(f'({str(filecount)})')
-        new_file_path = os.path.join(os.path.dirname(file_path), new_file_name+'.'+extension)
-        os.rename(file_path, new_file_path)
-        shutil.move(new_file_path, folder_path)
-    else:
-        shutil.move(file_path, folder_path)
-    filecount += 1
+    try:
+        if os.path.exists(os.path.join(folder_path, file)):
+            new_file_name = file.split('.')[0]+(f'({str(filecount)})')
+            new_file_path = os.path.join(os.path.dirname(file_path), new_file_name+'.'+extension)
+            os.rename(file_path, new_file_path)
+            shutil.move(new_file_path, folder_path)
+        else:
+            shutil.move(file_path, folder_path)
+        filecount += 1
+    except Exception as e:
+        print(e)
+    
 
 def organiser_utility(destination_folder, extension, file_path, file):
     extracted_flag=False
@@ -338,19 +342,21 @@ def organiser_utility(destination_folder, extension, file_path, file):
                     configs=json.load(f)
                 if not configs.get('zip_mode'):
                     organise_zip(file_path, destination_folder, file)
-                else:
+                else:  
                     with zipfile.ZipFile(file_path, 'r') as zip_ref:
-                        file_names=zip_ref.namelist()
+                        file_names = zip_ref.namelist()
                         for files in file_names:
                             now = datetime.datetime.now()
                             formatted_date = now.strftime("%Y-%m-%d-%H-%M-%S")
-                            extension_inzip=files.split('.')[-1].lower()
+                            extension_in_zip = files.split('.')[-1].lower()
                             for keyforzip in fType_dict.keys():
-                                if extension_inzip in keyforzip:
-                                    output_dir=os.path.join(destination_folder,fType_dict[keyforzip],file.split('.')[0]+' '+formatted_date)
-                                    log_info(os.path.basename(files),output_dir)
+                                if extension_in_zip in keyforzip:
+                                    output_dir = os.path.join(destination_folder, fType_dict[keyforzip],file.split('.')[0]+' '+formatted_date)
+                                    log_info(os.path.basename(files), output_dir)
                                     create_folder(output_dir)
-                                    zip_ref.extract(files, output_dir)                        
+                                    output_file_path = os.path.join(output_dir, os.path.basename(files))
+                                    with zip_ref.open(files) as source_file, open(output_file_path, "wb") as target_file:
+                                        target_file.write(source_file.read())                     
         else:
             organise_zip(file_path, destination_folder, file)
         os.remove(file_path)

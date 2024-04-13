@@ -1,4 +1,3 @@
-from aao_ut_filehandler import get_blendfile_folder
 from aao_ut_filehandler import get_downloads_folder
 from aao_ut_filehandler import organise
 from aao_ut_filehandler import return_projectfile_name
@@ -9,7 +8,7 @@ import bpy
 import os
 import time
 import threading
-import json
+
 
 ##Global Variables###
 loop_flag=True
@@ -50,7 +49,7 @@ class OBJECT_OT_destinationfolder(bpy.types.Operator):
     def execute(self, context):
         global destination_paths
         destination_paths = self.filepath
-        context.scene.destination_path=destination_paths
+        context.scene.destination_path=self.filepath
         reload_ui()
         return {'FINISHED'}
     
@@ -72,17 +71,6 @@ class STRING_PROPS_destination_path(bpy.types.PropertyGroup):
         default=default_setter('D_folder',''),
        
     )
-def get_blender_folder_path():
-    
-    global loop_flag
-    blender_folder = get_blendfile_folder()
-    project_file_name=return_projectfile_name()
-    while loop_flag:
-        if os.path.basename(blender_folder)==project_file_name:
-            loop_flag=False
-        blender_folder = os.path.dirname(blender_folder)
-    loop_flag=True
-    return blender_folder
 
 def on_start():
     global local_time_at_start
@@ -108,23 +96,21 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     def execute(self, context):
         selected_folder = context.scene.monitor_folder
         if selected_folder == 'DOWNLOADS':
-            if destination_paths!='':
+            if context.scene.destination_path!='':
                 threading.Thread(target=organise, daemon=True, args=(
-                    get_downloads_folder(), destination_paths, local_time_at_start)).start()
+                    get_downloads_folder(), context.scene.destination_path, local_time_at_start)).start()
                 self.report({'INFO'}, "Organising Files")
-
             else:
                 self.report({'ERROR'}, "Select a destination folder.")
 
         else:
-            if folder_paths!='':
-                if destination_paths!='':
+            if context.scene.folder_path!='':
+                if context.scene.destination_path!='':
                     threading.Thread(target=organise, daemon=True, args=(
-                        folder_paths, destination_paths, local_time_at_start)).start()
+                        context.scene.folder_path, context.scene.destination_path, local_time_at_start)).start()
                     self.report({'INFO'}, "Organising Files")
                 else:
                     self.report({'ERROR'}, "Select a destination folder.")
-
             else:
                 self.report({'ERROR'}, "Select a folder to monitor.")
                 context.scene.monitor_folder = 'DOWNLOADS'
