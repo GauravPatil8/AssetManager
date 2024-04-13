@@ -203,7 +203,7 @@ class OBJECT_OT_save_preset(bpy.types.Operator):
                         if enum_property.name != subdir_keys[i]:
                             path = subdirectories_relpath_dict[subdir_keys[i]]
                             base_dir = os.path.dirname(path)
-                            final_path = os.path.join(base_dir, enum_property.name)
+                            final_path = os.path.join(base_dir, os.path.basename(enum_property.name))
                             json_data[enum_property.tag] = final_path
                         else:
                             path = subdirectories_relpath_dict[subdir_keys[i]]
