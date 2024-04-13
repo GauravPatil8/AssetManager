@@ -1,14 +1,14 @@
 #Copyright (c) 2024 Gaurav 
-
 # bl_info = {
 #     "name": "Realtime Asset Organiser",
-#     "blender": (4, 1, 0),
-#     "category": "System",
 #     "author": "Gaurav",
 #     "version": (0, 1, 0),
-#     "location": "View3D > UI> Asset Organiser",
+#     "blender": (4, 0, 0),
+#     "location": "View3D > Sidebar > Asset Organiser",
 #     "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset organisation system.Support:assetorganiser.help@gmail.com",
-    
+#     "doc_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Documentation/Setup.md",
+#     "tracker_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/issues",
+#     "category": "System"
 # }
 
 import sys
