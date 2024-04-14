@@ -4,7 +4,6 @@ import time
 import threading
 from aao_ut_filehandler import organise
 from aao_ot_onclick_organise import get_downloads_folder
-from aao_ut_filehandler import return_projectfile_name
 from aao_ut_filehandler  import default_setter
 from aao_ot_onclick_organise import local_time_at_start
 report_flag=False

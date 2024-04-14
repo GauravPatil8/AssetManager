@@ -14,7 +14,7 @@ bl_info = {
 import sys
 import bpy
 import os
-import atexit
+
 
 script_path = os.path.abspath(__file__)
 package_path = os.path.dirname(script_path)
