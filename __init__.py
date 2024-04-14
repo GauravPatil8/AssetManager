@@ -21,7 +21,6 @@ package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
 
 from aao_ot_onclick_organise import on_start
-from aao_ut_filehandler      import path_constructor
 from aao_ot_onclick_organise import OBJECT_OT_Onclick_Organise  
 from aao_ot_monitoring_type  import OBJECT_OT_monitor_type
 from aao_ot_log              import OBJECT_OT_log
