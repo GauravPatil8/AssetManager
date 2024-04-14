@@ -33,6 +33,7 @@ class OBJECT_OT_Save_configs(bpy.types.Operator):
         if context.scene.monitor_folder!='DOWNLOADS':
             config_dict['M_folder']=context.scene.folder_path
         config_dict['D_folder']=context.scene.destination_path
+        
         if context.scene.monitoring_type_prop=='ONCLICKOPERATOR':
             config_dict['M_type']='ONCLICKOPERATOR'
         else:

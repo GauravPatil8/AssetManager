@@ -1,6 +1,6 @@
 from aao_ut_filehandler import get_downloads_folder
-from aao_ut_filehandler import organise
-from aao_ut_filehandler import return_projectfile_name
+from aao_ut_filehandler import organise,path_constructor
+from aao_ut_filehandler import images_folder_destination,project_folder_destination , model_folder_destination ,material_folder_destination ,video_folder_destination,audio_folder_destination
 from aao_ut_filehandler import default_setter
 from aao_pt_addonui     import OBJECT_PT_AssetManagerUI
 from bpy.props import StringProperty
@@ -22,8 +22,9 @@ package_path = os.path.dirname(script_path)
 def reload_ui():
     bpy.utils.unregister_class(OBJECT_PT_AssetManagerUI)
     bpy.utils.register_class(OBJECT_PT_AssetManagerUI)
+
 class OBJECT_OT_monitoringfolder(bpy.types.Operator):
-    bl_label=""
+    bl_label="Select Folder"
     bl_idname="ot.foldertomonitor"
     bl_description="share any preset from local device."
 
@@ -40,7 +41,7 @@ class OBJECT_OT_monitoringfolder(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 class OBJECT_OT_destinationfolder(bpy.types.Operator):
-    bl_label=""
+    bl_label="Select Folder"
     bl_idname="ot.foldertostore"
     bl_description="share any preset from local device."
 
@@ -75,6 +76,7 @@ class STRING_PROPS_destination_path(bpy.types.PropertyGroup):
 def on_start():
     global local_time_at_start
     local_time_at_start = time.time()
+    path_constructor(None)
 
 class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):
     bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(

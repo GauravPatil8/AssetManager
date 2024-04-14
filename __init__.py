@@ -1,15 +1,15 @@
 #Copyright (c) 2024 Gaurav 
-# bl_info = {
-#     "name": "Realtime Asset Organiser",
-#     "author": "Gaurav",
-#     "version": (0, 1, 0),
-#     "blender": (4, 0, 0),
-#     "location": "View3D > Sidebar > Asset Organiser",
-#     "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset organisation system.Support:assetorganiser.help@gmail.com",
-#     "doc_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Documentation/Setup.md",
-#     "tracker_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/issues",
-#     "category": "System"
-# }
+bl_info = {
+    "name": "Realtime Asset Organiser",
+    "author": "Gaurav",
+    "version": (0, 1, 0),
+    "blender": (4, 0, 0),
+    "location": "View3D > Sidebar > Asset Organiser",
+    "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset organisation system.Support:assetorganiser.help@gmail.com",
+    "doc_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Documentation/Setup.md",
+    "tracker_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/issues",
+    "category": "System"
+}
 
 import sys
 import bpy
@@ -21,6 +21,7 @@ package_path = os.path.dirname(script_path)
 sys.path.append(package_path)
 
 from aao_ot_onclick_organise import on_start
+from aao_ut_filehandler      import path_constructor,dictionary_constructor
 from aao_ot_onclick_organise import OBJECT_OT_Onclick_Organise  
 from aao_ot_monitoring_type  import OBJECT_OT_monitor_type
 from aao_ot_log              import OBJECT_OT_log
@@ -53,6 +54,7 @@ classes = (ENUM_PROPS_monitor_folder,ENUM_PROPS_delay_time, ENUM_PROPS_Tags, ENU
 def register():
     
     bpy.app.handlers.load_post.append(on_start)
+    bpy.app.handlers.load_post.append(path_constructor)
     for kls in classes:
         bpy.utils.register_class(kls)
     bpy.types.Scene.enum_properties = bpy.props.CollectionProperty(type=ENUM_PROPS_Tags)
@@ -63,5 +65,3 @@ def unregister():
         bpy.utils.unregister_class(kls)
     del bpy.types.Scene.enum_properties
     sys.path.remove(package_path)
-register()
-atexit.register(unregister)

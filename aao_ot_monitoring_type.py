@@ -63,17 +63,8 @@ def realtime_monitoring(self, context, stop_event,monitoring_folder,destination_
     global report_flag
     report_flag = True
     while not stop_event.is_set():
-        selected_folder = context.scene.monitor_folder
-
-        if selected_folder == 'DOWNLOADS':
-            if context.scene.destination_path!='':
-                organise(get_downloads_folder(), context.scene.destination_path, local_time_at_start)
-        else:
-            if monitoring_folder!='':
-                if destination_folder!='':
-                    organise(monitoring_folder, destination_folder, local_time_at_start)
-            else:
-                context.scene.monitor_folder = 'DOWNLOADS'
+        
+        organise(monitoring_folder, destination_folder, local_time_at_start)
 
         if context.scene.delay_time_prop == 'ONE':
             time.sleep(1)

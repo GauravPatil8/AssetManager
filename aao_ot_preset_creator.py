@@ -21,7 +21,7 @@ clearance_flag=False
 
 
 def update_folder_path(self,context):
-    path_constructor()
+    path_constructor(context.scene.folder_presets)
 
 def reload_panel():
     bpy.utils.unregister_class(OBJECT_PT_preset_creator)
@@ -98,8 +98,7 @@ class OBJECT_OT_update_preset_list(Operator):
         bpy.types.Scene.folder_presets = bpy.props.EnumProperty(
             items=preset_list,
             description="Select a folder structure",
-            default=default_setter('preset','DEFAULT'),
-        )
+            )
         return {'FINISHED'}
 
 
@@ -179,9 +178,8 @@ class ENUM_PROPS_folder_presets(bpy.types.PropertyGroup):
         items=preset_list,
         description="Select a folder structure",
         default=default_setter('preset','DEFAULT'),
-        update=update_folder_path
+        update=update_folder_path,
     )
-
 
 class OBJECT_OT_save_preset(bpy.types.Operator):
     bl_label = 'Save Preset'

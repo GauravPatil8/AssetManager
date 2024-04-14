@@ -70,7 +70,7 @@ def dictionary_constructor():
     for index,extension_list in enumerate(fType_list):
         fType_dict[tuple(extension_list)]= fType_names[index]
 
-dictionary_constructor()
+
 # def update_recent_file_path(old_path, new_path):
     
 #     config_directory = bpy.utils.user_resource('CONFIG')
@@ -109,7 +109,7 @@ def return_projectfile_name():
         return project_folder_destination
         
 
-def path_constructor():
+def path_constructor(presetname):
     global images_folder_destination 
     global project_folder_destination 
     global model_folder_destination 
@@ -118,28 +118,47 @@ def path_constructor():
     global audio_folder_destination 
 
 
-    scene = bpy.context.scene
+    json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
+    if os.path.exists(json_file_name):
+        with open(json_file_name) as f:
+            configs=json.load(f)
+        
     
-    if scene.folder_presets!='DEFAULT':
-        
-        preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
-        
-        with open(preset_path) as f:
-            f_names=json.load(f)
-        
-        images_folder_destination = f_names.get('IMAGE',images_folder_destination)
-        project_folder_destination = f_names.get('PROJECT',project_folder_destination)
-        model_folder_destination = f_names.get('MODEL',model_folder_destination)
-        material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
-        video_folder_destination = f_names.get('VIDEO',video_folder_destination)
-        audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
+        if configs['preset']!='DEFAULT':
+            
+            preset_path=os.path.join(file_folder_path,(f"{configs['preset']}.json"))
+            
+            with open(preset_path) as f:
+                f_names=json.load(f)
+            
+            images_folder_destination = f_names.get('IMAGE',images_folder_destination)
+            project_folder_destination = f_names.get('PROJECT',project_folder_destination)
+            model_folder_destination = f_names.get('MODEL',model_folder_destination)
+            material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
+            video_folder_destination = f_names.get('VIDEO',video_folder_destination)
+            audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
     else:
-        images_folder_destination = "Textures"
-        project_folder_destination = "Project_Files"
-        model_folder_destination = "Models"
-        material_folder_destination = "Material_files"
-        video_folder_destination = "Video_files"
-        audio_folder_destination = "Audio_files"
+        try:
+            preset_path=os.path.join(file_folder_path,(f"{presetname}.json"))
+            if os.path.exists(preset_path):
+                with open(preset_path) as f:
+                    f_names=json.load(f)
+            
+                images_folder_destination = f_names.get('IMAGE',images_folder_destination)
+                project_folder_destination = f_names.get('PROJECT',project_folder_destination)
+                model_folder_destination = f_names.get('MODEL',model_folder_destination)
+                material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
+                video_folder_destination = f_names.get('VIDEO',video_folder_destination)
+                audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
+        except:
+            images_folder_destination = "Textures"
+            project_folder_destination = "Project_Files"
+            model_folder_destination = "Models"
+            material_folder_destination = "Material_files"
+            video_folder_destination = "Video_files"
+            audio_folder_destination = "Audio_files"
+            
+        
     dictionary_constructor()
     
         
@@ -311,6 +330,7 @@ def get_downloads_folder():
     return os.path.join(os.path.expanduser('~'), 'Downloads')
 
 def duplicate_handler(file_path, file, folder_path, extension):
+    #CHeck this function for duplicate files
     global filecount
     try:
         if os.path.exists(os.path.join(folder_path, file)):
@@ -369,9 +389,8 @@ def organise(source_folder, destination_folder, localtime_at_Start):
         if os.path.isfile(file_path):
 
             if os.path.getmtime(file_path) >= localtime_at_Start:
-
-                if os.path.isfile(file_path):
                     
-                    extension = file.split('.')[-1].lower()
+                extension = file.split('.')[-1].lower()
 
-                    organiser_utility(destination_folder,extension, file_path, file)
+                organiser_utility(destination_folder,extension, file_path, file)
+            
