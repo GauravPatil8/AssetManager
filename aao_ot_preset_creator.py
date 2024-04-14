@@ -98,6 +98,7 @@ class OBJECT_OT_update_preset_list(Operator):
         bpy.types.Scene.folder_presets = bpy.props.EnumProperty(
             items=preset_list,
             description="Select a folder structure",
+            update=update_folder_path,
             )
         return {'FINISHED'}
 

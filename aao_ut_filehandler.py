@@ -97,16 +97,16 @@ def dictionary_constructor():
 #     else:
 #         return None
 
-def return_projectfile_name():
-    scene = bpy.context.scene
+# def return_projectfile_name():
+#     scene = bpy.context.scene
     
-    if scene.folder_presets!='DEFAULT':
-        preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
-        with open(preset_path) as f:
-            f_names=json.load(f)
-        return f_names.get('PROJECT',project_folder_destination)
-    else:
-        return project_folder_destination
+#     if scene.folder_presets!='DEFAULT':
+#         preset_path=os.path.join(file_folder_path,scene.folder_presets+'.json')
+#         with open(preset_path) as f:
+#             f_names=json.load(f)
+#         return f_names.get('PROJECT',project_folder_destination)
+#     else:
+#         return project_folder_destination
         
 
 def path_constructor(presetname):
@@ -116,13 +116,11 @@ def path_constructor(presetname):
     global material_folder_destination 
     global video_folder_destination 
     global audio_folder_destination 
-
-
+    
     json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
     if os.path.exists(json_file_name):
         with open(json_file_name) as f:
             configs=json.load(f)
-        
     
         if configs['preset']!='DEFAULT':
             

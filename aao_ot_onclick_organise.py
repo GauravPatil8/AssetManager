@@ -76,7 +76,7 @@ class STRING_PROPS_destination_path(bpy.types.PropertyGroup):
 def on_start():
     global local_time_at_start
     local_time_at_start = time.time()
-    path_constructor(None)
+    path_constructor('')
 
 class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):
     bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
