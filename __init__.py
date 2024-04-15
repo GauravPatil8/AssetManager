@@ -1,15 +1,15 @@
 #Copyright (c) 2024 Gaurav 
-# bl_info = {
-#     "name": "Realtime Asset Organiser",
-#     "author": "Gaurav",
-#     "version": (0, 1, 0),
-#     "blender": (4, 0, 0),
-#     "location": "View3D > Sidebar > Asset Organiser",
-#     "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset organisation system.Support:assetorganiser.help@gmail.com",
-#     "doc_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Documentation/Setup.md",
-#     "tracker_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/issues",
-#     "category": "System"
-# }
+bl_info = {
+    "name": "Realtime Asset Organiser",
+    "author": "Gaurav",
+    "version": (0, 1, 0),
+    "blender": (4, 0, 0),
+    "location": "View3D > Sidebar > Asset Organiser",
+    "description": "Real-time Asset Organizer for 3D Artists is a powerful Blender addon designed to streamline and enhance the workflow of 3D artists by providing a dynamic and efficient asset organisation system.Support:assetorganiser.help@gmail.com",
+    "doc_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Documentation/1.Preset.md",
+    "tracker_url": "https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/issues",
+    "category": "System"
+}
 
 import sys
 import bpy
@@ -56,4 +56,4 @@ def unregister():
         bpy.utils.unregister_class(kls)
     del bpy.types.Scene.enum_properties
     sys.path.remove(package_path)
-register()
+
