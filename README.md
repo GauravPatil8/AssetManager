@@ -1,36 +1,55 @@
-# Realtime Asset Manager for Blender
+# Real-time Asset Organizer
 
 ## Overview
 
-Realtime Asset Manager is an addon designed for the 3D software package Blender. It enhances your workflow by providing automated organization for project files and textures.
+This markdown document outlines the functionality and use cases of the Real-Time Asset Organiser addon designed to categorize and organize files  in real-time. This documentation serves to present the features of the Blender add-on "Real-time Asset Organizer". The add-on can be purchased from [this link](#). <br>
+![Addonui](https://github.com/Gauravpatil-8/Real-Time-Asset-Organiser/blob/main/Resource/Addonui.png)<br>
+### Working
 
-## Main Features
+1. **Categorization**: Files are categorized into the following categories:
+   - Model
+   - Project files
+   - Textures
+   - Video files
+   - Audio files
+   - Material files
 
-1. **Auto Organizing Project Files:** Streamline your workflow with automatic organization of project files. The addon intelligently organizes your Blender project files, making it easier to manage and navigate through your projects.
+2. **Real-time Organization**: The software operates in real-time, providing users with options to delay the organization of assets by 3 seconds, 7 seconds, or 10 seconds.
 
-2. **Auto Texture Organization:** Effortlessly manage textures within your Blender projects. The addon automatically organizes textures, ensuring a clean and structured project setup.
+3. **File Movement**: After categorization, files are automatically moved to their assigned folders based on their types.
 
-## Installation
+4. **Logging**: The software logs the relocation of files, enabling users to track the location of their files easily.
 
-1. Download the addon ZIP file from the [releases](https://github.com/Gauravpatil-8/AssetManager/releases/tag/v0.1) page.
-2. Open Blender and go to `Edit` > `Preferences`.
-3. Click on the `Add-ons` tab.
-4. Click `Install` and select the downloaded ZIP file.
-5. Enable the "Realtime Asset Manager" addon.
+5. **Custom Folder Structure**: Users can create their custom folder structure, which the algorithm follows while organizing the assets/files.
 
-## Usage
+### Use Cases
 
-1. After installation, you can access the addon from the Blender toolbar.
-2. Configure the settings according to your preferences.
-3. Enjoy the benefits of automated project file and texture organization.
+1. **Hobbyists and Professionals**: Suitable for both hobbyists and professionals who deal with various types of files and need efficient organization.
 
-## Contribution
+2. **Freelancers**: Freelancers working remotely often need to download assets from team drives. This software helps in organizing assets in real-time, enhancing productivity and simplifying asset management.
 
-Contributions are welcome! If you find any issues or have suggestions for improvements, please create an [issue](https://github.com/yourusername/Realtime_Asset_Manager/issues) or submit a pull request.
+3. **Hobbyists and Animators**: Useful for hobbyists and animators who frequently download textures and models online for animation purposes.
 
+## Example
 
----
+### Scenario:
 
-Happy 3D Asset Handling with Realtime Asset Manager!
+A user, a freelance animator, receives multiple files from his client's cloud storage. He needs to organize these files efficiently to streamline his workflow.
 
+### Solution:
 
+1. The user sets up the Asset organizer Addon with his custom folder structure, including folders for models, textures, project files, etc.
+
+2. As the user downloads files from the client's drive, the software automatically categorizes and moves them to their respective folders in real-time.
+
+3. If the user wants to review the file movements, he can check the software's logs to ensure all files are correctly organized.
+
+4. The user can also set a delay option to organize files after a specific duration, allowing him time to review and manage his workflow effectively.
+
+### Result:
+
+With the Asset organizer Addon, the user can efficiently manage his files, saving time and increasing productivity in his animation projects.
+
+## Conclusion
+
+The Real-Time Asset Organiser addon offers a convenient solution for categorizing and organizing various file types in real-time. Its customizable features cater to the needs of both hobbyists and professionals, making asset management seamless and efficient.

@@ -3,6 +3,7 @@ from aao_ut_filehandler import organise,path_constructor
 from aao_ut_filehandler import images_folder_destination,project_folder_destination , model_folder_destination ,material_folder_destination ,video_folder_destination,audio_folder_destination
 from aao_ut_filehandler import default_setter
 from aao_pt_addonui     import OBJECT_PT_AssetManagerUI
+from aao_constants import MONTIORING_ONCLICK_ID,MONTIORING_REALTIME_ID,SRCFOLDER_DOWNLOADS_ID,SRCFOLDER_CUSTOM_ID,REALTIME_DELAY_ONE,REALTIME_DELAY_SEVEN,REALTIME_DELAY_THREE
 from bpy.props import StringProperty
 import bpy
 import os
@@ -26,7 +27,7 @@ def reload_ui():
 class OBJECT_OT_monitoringfolder(bpy.types.Operator):
     bl_label="Select Folder"
     bl_idname="ot.foldertomonitor"
-    bl_description="share any preset from local device."
+    bl_description="Select Folder To Monitor For Newly Downloaded Files."
 
     filepath: StringProperty(subtype="DIR_PATH")  #type: ignore
 
@@ -43,7 +44,7 @@ class OBJECT_OT_monitoringfolder(bpy.types.Operator):
 class OBJECT_OT_destinationfolder(bpy.types.Operator):
     bl_label="Select Folder"
     bl_idname="ot.foldertostore"
-    bl_description="share any preset from local device."
+    bl_description="Select Folder To Store Organised Assets."
 
     filepath: StringProperty(subtype="DIR_PATH")  #type: ignore
 
@@ -58,36 +59,12 @@ class OBJECT_OT_destinationfolder(bpy.types.Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
     
-class STRING_PROPS_folder_path(bpy.types.PropertyGroup):
-    bpy.types.Scene.folder_path = bpy.props.StringProperty(
-        name="",
-        description="Enter folder path",
-        default=default_setter('M_folder',''),
-       
-    )
-class STRING_PROPS_destination_path(bpy.types.PropertyGroup):
-    bpy.types.Scene.destination_path = bpy.props.StringProperty(
-        name="",
-        description="Enter destination path",
-        default=default_setter('D_folder',''),
-       
-    )
 
 def on_start():
     global local_time_at_start
     local_time_at_start = time.time()
     path_constructor('')
 
-class ENUM_PROPS_monitor_folder(bpy.types.PropertyGroup):
-    bpy.types.Scene.monitor_folder = bpy.props.EnumProperty(
-        items=[
-            ('DOWNLOADS', 'Monitor Downloads Folder',
-             'This option enables monitoring of the downloads folder for newly added files.'),
-            ('CUSTOMFOLDER', 'Select Folder To Monitor',
-             'This option enables monitoring of the folder that you choose for newly added files.'),
-        ],
-        default=default_setter('analysis_folder','DOWNLOADS'),
-    )
 
 
 class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
@@ -97,7 +74,7 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
     on_start()
     def execute(self, context):
         selected_folder = context.scene.monitor_folder
-        if selected_folder == 'DOWNLOADS':
+        if selected_folder == SRCFOLDER_DOWNLOADS_ID:
             if context.scene.destination_path!='':
                 threading.Thread(target=organise, daemon=True, args=(
                     get_downloads_folder(), context.scene.destination_path, local_time_at_start)).start()
@@ -115,6 +92,6 @@ class OBJECT_OT_Onclick_Organise(bpy.types.Operator):
                     self.report({'ERROR'}, "Select a destination folder.")
             else:
                 self.report({'ERROR'}, "Select a folder to monitor.")
-                context.scene.monitor_folder = 'DOWNLOADS'
+                context.scene.monitor_folder = SRCFOLDER_DOWNLOADS_ID
 
         return {'FINISHED'}

@@ -1,0 +1,40 @@
+PRESET_DEFAULT_ID       ='DEFAULT'
+SRCFOLDER_DOWNLOADS_ID  ='DOWNLOADS'
+SRCFOLDER_CUSTOM_ID     ='CUSTOMFOLDER'
+MONTIORING_ONCLICK_ID   ='ONCLICKOPERATOR'
+MONTIORING_REALTIME_ID  ='REALTIME'
+REALTIME_DELAY_ONE      ='ONE'
+REALTIME_DELAY_THREE    ='THREE'
+REALTIME_DELAY_SEVEN    ='SEVEN'
+ZIPMODE_SEPERATE_ID     ='SEP'
+ZIPMODE_PREDOMINANT_ID  ='NOSEP'
+
+### Folder tags###
+TAG_EMPTY   ='NONE'
+TAG_PROJECT ='PROJECT'
+TAG_MODEL   ='MODEL'
+TAG_IMAGE   ='IMAGE'
+TAG_VIDEO   ='VIDEO'
+TAG_AUDIO   ='AUDIO'
+TAG_MATERIAL='MATERIAL'
+
+### default destination names###
+DEFAULT_IMAGE_DEST      = "Textures"
+DEFAULT_PROJECT_DEST    = "Project_Files"
+DEFAULT_MODEL_DEST      = "Models"
+DEFAULT_MATERIAL_DEST   = "Material_files"
+DEFAULT_VIDEO_DEST      = "Video_files"
+DEFAULT_AUDIO_DEST      = "Audio_files"
+DEFAULT_TEMPORARY_DEST  ='Temporary asset folder'
+DEFAULT_PRESET_DEST     ='Presets'
+
+### Config Dictionary keys ###
+PRESET_KEY          ='preset'
+SRCFOLDER_KEY       ='analysis_folder'
+DESTFOLDERPATH_KEY  ='D_folder'
+SRCFOLDERPATH_KEY   ='M_folder'
+MONITORING_KEY      ='M_type'
+DELAY_KEY           ='R_time'
+ZIPENUM_KEY         ='zip_enum'
+ZIPMODE_KEY         ='zip_mode'
+

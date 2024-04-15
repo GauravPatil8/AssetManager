@@ -6,14 +6,16 @@ from bpy.props import StringProperty
 from aao_ut_filehandler import get_package_path
 from aao_ut_filehandler import path_constructor
 from aao_ut_filehandler import default_setter
+from aao_constants import PRESET_DEFAULT_ID,TAG_MODEL,TAG_IMAGE,TAG_AUDIO,TAG_EMPTY,TAG_MATERIAL,TAG_PROJECT,TAG_VIDEO,DEFAULT_PRESET_DEST
 
 
-preset_folder_name="Presets"
+preset_folder_name=DEFAULT_PRESET_DEST
+
 subdirectories_relpath_dict = {}
 json_data = {}
 subdirectory = []
 selected_folder_path = None
-preset_list = [('DEFAULT', 'Default','Stores downloaded files in a simple folder structure based on their type'),]
+preset_list = [(PRESET_DEFAULT_ID, 'Default','Stores downloaded files in a simple folder structure based on their type'),]
 package_path = get_package_path()
 target_folder = os.path.join(package_path,preset_folder_name)
 
@@ -31,7 +33,7 @@ def reload_panel():
 def duplicate_tags_checker(context):
     seen = set()
     for tag_enum in context.scene.enum_properties:
-        if tag_enum.tag != 'NONE' and tag_enum.tag in seen:
+        if tag_enum.tag != TAG_EMPTY and tag_enum.tag in seen:
             return True
         seen.add(tag_enum.tag)
     return False
@@ -64,23 +66,6 @@ def get_subdirectories(directory):
             subdirectories.extend(get_subdirectories(item_path))
     return subdirectories
 
-
-class ENUM_PROPS_Tags(bpy.types.PropertyGroup):
-    name: bpy.props.StringProperty()  # type: ignore
-    tag: bpy.props.EnumProperty(
-        items=[
-            ('NONE', 'none', 'No Tags'),
-            ('PROJECT', 'project_files', "This tag is designated for storing files with extensions such as 'max,' '3ds,' 'blend,' 'c4d,' 'bgeo,' and 'geo.' Any files with these extensions will be organized and kept in this folder."),
-            ('MODEL', 'model_files', "This tag will be used to categorize and store files with specific extensions, including 'obj', 'fbx', 'usdz', 'dae', 'usd*', 'ply', 'glb', 'gltf', and 'x3d'. These files will be organized and kept in this designated folder."),
-            ('IMAGE', 'image_files', "This tag designates a folder where files with the following extensions will be stored: ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp', 'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif']. These file types will be saved in the specified location."),
-            ('MATERIAL', 'material_files', "This tag designates a folder for storing files with specific extensions such as 'sbsar', 'spsm', 'spp', and 'sbs'."),
-            ('VIDEO', 'video_files', "This tag designates a folder where files with extensions such as 'mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', and 'flv' will be organized and stored."),
-            ('AUDIO', 'audio_files', "This tag designates the types of files that will be stored in a specific folder. It includes a variety of audio file extensions such as 'wav,' 'mp3,' 'flac,' 'ogg,' 'm3u,' 'acc,' 'wma,' 'midi,' 'aif,' 'm4a,' 'mpa,' and 'pls.'")
-        ],
-        name="tag"
-    )  # type: ignore
-
-
 class OBJECT_OT_update_preset_list(Operator):
     bl_idname = 'ot.updateenum'
     bl_label = 'update'
@@ -101,24 +86,6 @@ class OBJECT_OT_update_preset_list(Operator):
             update=update_folder_path,
             )
         return {'FINISHED'}
-
-
-class STRING_PROPS_preset_name(bpy.types.PropertyGroup):
-    bpy.types.Scene.preset_name = bpy.props.StringProperty(
-        name="Enter Preset Name",
-        description="Enter Preset name",
-        default="",
-       
-    )
-
-
-class STRING_PROPS_preset_analysis_folder(bpy.types.PropertyGroup):
-    bpy.types.Scene.preset_analysis_folder = bpy.props.StringProperty(
-        name="Select Folder",
-        description="Select folder to be Analysied",
-        default="",
-    )
-
 
 class OPEN_FOLDER_OT_OpenFolder(Operator):
     bl_idname = "folder_selector.open_folder"
@@ -158,7 +125,7 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
         for sub_dir in subdirectories:
                 new_enum_property = context.scene.enum_properties.add()
                 new_enum_property.name = sub_dir
-                new_enum_property.tag = "NONE"
+                new_enum_property.tag = TAG_EMPTY
         reload_panel()
         return {'FINISHED'}
 
@@ -166,11 +133,24 @@ class OPEN_FOLDER_OT_OpenFolder(Operator):
         context.window_manager.fileselect_add(self)
         return {'RUNNING_MODAL'}
 
-
+class ENUM_PROPS_Tags(bpy.types.PropertyGroup):
+    name: bpy.props.StringProperty()  # type: ignore
+    tag: bpy.props.EnumProperty(
+        items=[
+            (TAG_EMPTY, 'none', 'No Tags'),
+            (TAG_PROJECT, 'project_files', "This tag is designated for storing files with extensions such as 'max,' '3ds,' 'blend,' 'c4d,' 'bgeo,' and 'geo.' Any files with these extensions will be organized and kept in this folder."),
+            (TAG_MODEL, 'model_files', "This tag will be used to categorize and store files with specific extensions, including 'obj', 'fbx', 'usdz', 'dae', 'usd*', 'ply', 'glb', 'gltf', and 'x3d'. These files will be organized and kept in this designated folder."),
+            (TAG_IMAGE, 'image_files', "This tag designates a folder where files with the following extensions will be stored: ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp', 'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif']. These file types will be saved in the specified location."),
+            (TAG_MATERIAL, 'material_files', "This tag designates a folder for storing files with specific extensions such as 'sbsar', 'spsm', 'spp', and 'sbs'."),
+            (TAG_VIDEO, 'video_files', "This tag designates a folder where files with extensions such as 'mov', 'mp4', 'mkv', 'avi', 'wmv', 'avchd', 'webm', and 'flv' will be organized and stored."),
+            (TAG_AUDIO, 'audio_files', "This tag designates the types of files that will be stored in a specific folder. It includes a variety of audio file extensions such as 'wav,' 'mp3,' 'flac,' 'ogg,' 'm3u,' 'acc,' 'wma,' 'midi,' 'aif,' 'm4a,' 'mpa,' and 'pls.'")
+        ],
+        name="tag"
+    )#type: ignore 
 class ENUM_PROPS_folder_presets(bpy.types.PropertyGroup):
     global preset_list
     for file in os.listdir(target_folder):
-        if os.path.isfile(os.path.join(target_folder, file)) and file != 'Default.db':
+        if os.path.isfile(os.path.join(target_folder, file)):
             file_name = file.split('.')[0]
             file_description = ''
             preset_list.append(tuple([file_name, file_name, file_description]))
@@ -178,7 +158,7 @@ class ENUM_PROPS_folder_presets(bpy.types.PropertyGroup):
     bpy.types.Scene.folder_presets = bpy.props.EnumProperty(
         items=preset_list,
         description="Select a folder structure",
-        default=default_setter('preset','DEFAULT'),
+        default=default_setter('preset',PRESET_DEFAULT_ID),
         update=update_folder_path,
     )
 
@@ -188,7 +168,6 @@ class OBJECT_OT_save_preset(bpy.types.Operator):
 
     def execute(self, context: Context):
         global selected_folder_path
-        global subdirectories
         global subdirectories_relpath_dict
         global json_data
         if context.scene.preset_name != '':

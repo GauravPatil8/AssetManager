@@ -6,6 +6,7 @@ from aao_ut_filehandler import organise
 from aao_ot_onclick_organise import get_downloads_folder
 from aao_ut_filehandler  import default_setter
 from aao_ot_onclick_organise import local_time_at_start
+from aao_constants import MONTIORING_ONCLICK_ID,MONTIORING_REALTIME_ID,SRCFOLDER_DOWNLOADS_ID,REALTIME_DELAY_ONE,REALTIME_DELAY_SEVEN,REALTIME_DELAY_THREE,MONITORING_KEY
 report_flag=False
 loop_flag=True
 thread_flag = False
@@ -28,7 +29,7 @@ def monitoring_type_prop_update_handler(self, context):
     global thread_flag
     global report_flag
 
-    if self.monitoring_type_prop == 'ONCLICKOPERATOR':
+    if self.monitoring_type_prop == MONTIORING_ONCLICK_ID:
         stop_event.set()
         thread_flag = False
         report_flag = False
@@ -38,26 +39,13 @@ def monitoring_type_prop_update_handler(self, context):
 class ENUM_PROPS_monitoring_type(bpy.types.PropertyGroup):
     bpy.types.Scene.monitoring_type_prop = bpy.props.EnumProperty(
         items=[
-            ('REALTIME', 'Real-time', 'Organises folder in real-time'),
-            ('ONCLICKOPERATOR', 'On-click', 'Organises folder on click'),
+            (MONTIORING_REALTIME_ID, 'Real-time', 'Organises folder in real-time'),
+            (MONTIORING_ONCLICK_ID, 'On-click', 'Organises folder on click'),
         ],
-        default=default_setter('M_type','ONCLICKOPERATOR'),
+        default=default_setter(MONITORING_KEY,MONTIORING_ONCLICK_ID),
         update=monitoring_type_prop_update_handler,
     )
     
-
-
-class ENUM_PROPS_delay_time(bpy.types.PropertyGroup):
-    bpy.types.Scene.delay_time_prop = bpy.props.EnumProperty(
-        items=[
-            ('ONE', '1 Seconds', 'Orgnises folder after every one seconds'),
-            ('THREE', '3 Seconds', 'Orgnises folder after every three seconds'),
-            ('SEVEN', '7 Seconds', 'Orgnises folder after every seven seconds')
-        ],
-        default=default_setter('R_time','THREE'),
-    )
-
-
 def realtime_monitoring(self, context, stop_event,monitoring_folder,destination_folder):
     global report_flag
     report_flag = True
@@ -65,11 +53,11 @@ def realtime_monitoring(self, context, stop_event,monitoring_folder,destination_
         
         organise(monitoring_folder, destination_folder, local_time_at_start)
 
-        if context.scene.delay_time_prop == 'ONE':
+        if context.scene.delay_time_prop == REALTIME_DELAY_ONE:
             time.sleep(1)
-        elif context.scene.delay_time_prop == 'THREE':
+        elif context.scene.delay_time_prop == REALTIME_DELAY_THREE:
             time.sleep(3)
-        else:
+        elif context.scene.delay_time_prop == REALTIME_DELAY_SEVEN:
             time.sleep(7)
 
 class OBJECT_OT_monitor_type(bpy.types.Operator):
@@ -87,7 +75,7 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
         if report_flag==True:
             self.report({'WARNING'},f"Real-time monitoring has already started,currently monitoring {context.scene.monitor_folder}")
         else:
-            if context.scene.monitor_folder == "DOWNLOADS":
+            if context.scene.monitor_folder == SRCFOLDER_DOWNLOADS_ID:
                 if destination_path_realtime!='':
                     self.report({'INFO'}, "Real-time monitoring has started")
             
@@ -110,5 +98,5 @@ class OBJECT_OT_monitor_type(bpy.types.Operator):
                             self.report({'ERROR'}, "Select a destination folder.")
                     else:
                         self.report({'ERROR'}, "Select a folder to monitor.")
-                        context.scene.monitor_folder='DOWNLOADS'
+                        context.scene.monitor_folder=SRCFOLDER_DOWNLOADS_ID
         return {'FINISHED'}

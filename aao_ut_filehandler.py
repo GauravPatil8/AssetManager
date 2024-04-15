@@ -5,6 +5,7 @@ import zipfile
 import json
 import datetime
 from aao_ot_log import file_data
+from aao_constants import PRESET_DEFAULT_ID,TAG_AUDIO,TAG_IMAGE,TAG_MATERIAL,TAG_MODEL,TAG_PROJECT,TAG_VIDEO,DEFAULT_IMAGE_DEST,DEFAULT_PROJECT_DEST,DEFAULT_MODEL_DEST,DEFAULT_AUDIO_DEST,DEFAULT_MATERIAL_DEST,DEFAULT_VIDEO_DEST,DEFAULT_TEMPORARY_DEST,DEFAULT_PRESET_DEST,ZIPMODE_KEY,PRESET_KEY
 
 def get_package_path():
     script_path = os.path.abspath(__file__)
@@ -17,17 +18,17 @@ save_flag = False
 
 
 package_path = get_package_path()
-file_folder_path = os.path.join(package_path, "Presets")
+file_folder_path = os.path.join(package_path, DEFAULT_PRESET_DEST)
 if not os.path.exists(file_folder_path):
     os.mkdir(file_folder_path)
 
-images_folder_destination = "Textures"
-project_folder_destination = "Project_Files"
-model_folder_destination = "Models"
-material_folder_destination = "Material_files"
-video_folder_destination = "Video_files"
-audio_folder_destination = "Audio_files"
-temporary_folder_name='Temporary asset folder'
+images_folder_destination = DEFAULT_IMAGE_DEST
+project_folder_destination = DEFAULT_PROJECT_DEST
+model_folder_destination = DEFAULT_MODEL_DEST
+material_folder_destination = DEFAULT_MATERIAL_DEST
+video_folder_destination = DEFAULT_VIDEO_DEST
+audio_folder_destination = DEFAULT_AUDIO_DEST
+temporary_folder_name=DEFAULT_TEMPORARY_DEST
 
 
 project_files = ['max', '3ds', 'blend', 'c4d', 'bgeo', 'geo','zpr','ma','mb','skp','3dm','sldprt','sldasm','zbp','hip']
@@ -117,46 +118,55 @@ def path_constructor(presetname):
     global video_folder_destination 
     global audio_folder_destination 
     
-    json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
-    if os.path.exists(json_file_name):
-        with open(json_file_name) as f:
-            configs=json.load(f)
-    
-        if configs['preset']!='DEFAULT':
-            
-            preset_path=os.path.join(file_folder_path,(f"{configs['preset']}.json"))
-            
-            with open(preset_path) as f:
-                f_names=json.load(f)
-            
-            images_folder_destination = f_names.get('IMAGE',images_folder_destination)
-            project_folder_destination = f_names.get('PROJECT',project_folder_destination)
-            model_folder_destination = f_names.get('MODEL',model_folder_destination)
-            material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
-            video_folder_destination = f_names.get('VIDEO',video_folder_destination)
-            audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
-    else:
-        try:
-            preset_path=os.path.join(file_folder_path,(f"{presetname}.json"))
-            if os.path.exists(preset_path):
+    if presetname!=PRESET_DEFAULT_ID:
+        json_file_name =os.path.join(package_path,'addon_configuration','AddonDefaults.json')
+        if os.path.exists(json_file_name):
+            with open(json_file_name) as f:
+                configs=json.load(f)
+        
+            if configs[PRESET_KEY]!=PRESET_DEFAULT_ID:
+                preset_path=os.path.join(file_folder_path,(f"{configs[PRESET_KEY]}.json"))
+                
                 with open(preset_path) as f:
                     f_names=json.load(f)
+                
+                images_folder_destination = f_names.get(TAG_IMAGE,images_folder_destination)
+                project_folder_destination = f_names.get(TAG_PROJECT,project_folder_destination)
+                model_folder_destination = f_names.get(TAG_MODEL,model_folder_destination)
+                material_folder_destination =f_names.get(TAG_MATERIAL,material_folder_destination)
+                video_folder_destination = f_names.get(TAG_VIDEO,video_folder_destination)
+                audio_folder_destination = f_names.get(TAG_AUDIO,audio_folder_destination)
             
-                images_folder_destination = f_names.get('IMAGE',images_folder_destination)
-                project_folder_destination = f_names.get('PROJECT',project_folder_destination)
-                model_folder_destination = f_names.get('MODEL',model_folder_destination)
-                material_folder_destination =f_names.get('MATERIAL',material_folder_destination)
-                video_folder_destination = f_names.get('VIDEO',video_folder_destination)
-                audio_folder_destination = f_names.get('AUDIO',audio_folder_destination)
-        except:
-            images_folder_destination = "Textures"
-            project_folder_destination = "Project_Files"
-            model_folder_destination = "Models"
-            material_folder_destination = "Material_files"
-            video_folder_destination = "Video_files"
-            audio_folder_destination = "Audio_files"
-            
-        
+        else:
+            try:
+                preset_path=os.path.join(file_folder_path,(f"{presetname}.json"))
+                if os.path.exists(preset_path):
+                    with open(preset_path) as f:
+                        f_names=json.load(f)
+                
+                    images_folder_destination = f_names.get(TAG_IMAGE,images_folder_destination)
+                    project_folder_destination = f_names.get(TAG_PROJECT,project_folder_destination)
+                    model_folder_destination = f_names.get(TAG_MODEL,model_folder_destination)
+                    material_folder_destination =f_names.get(TAG_MATERIAL,material_folder_destination)
+                    video_folder_destination = f_names.get(TAG_VIDEO,video_folder_destination)
+                    audio_folder_destination = f_names.get(TAG_AUDIO,audio_folder_destination)
+                else:
+                    images_folder_destination = DEFAULT_IMAGE_DEST
+                    project_folder_destination = DEFAULT_PROJECT_DEST
+                    model_folder_destination = DEFAULT_MODEL_DEST
+                    material_folder_destination = DEFAULT_MATERIAL_DEST
+                    video_folder_destination = DEFAULT_VIDEO_DEST
+                    audio_folder_destination = DEFAULT_AUDIO_DEST
+            except Exception as e:
+                print(e)
+    else:
+        images_folder_destination = DEFAULT_IMAGE_DEST
+        project_folder_destination = DEFAULT_PROJECT_DEST
+        model_folder_destination = DEFAULT_MODEL_DEST
+        material_folder_destination = DEFAULT_MATERIAL_DEST
+        video_folder_destination = DEFAULT_VIDEO_DEST
+        audio_folder_destination = DEFAULT_AUDIO_DEST
+
     dictionary_constructor()
     
         
@@ -358,7 +368,7 @@ def organiser_utility(destination_folder, extension, file_path, file):
             if os.path.exists(json_file_name):
                 with open(json_file_name) as f:
                     configs=json.load(f)
-                if not configs.get('zip_mode'):
+                if not configs.get(ZIPMODE_KEY):
                     organise_zip(file_path, destination_folder, file)
                 else:  
                     with zipfile.ZipFile(file_path, 'r') as zip_ref:
