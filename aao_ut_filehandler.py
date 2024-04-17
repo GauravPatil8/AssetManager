@@ -50,6 +50,9 @@ def default_setter(key,default):
     if os.path.exists(json_file_name):
         with open(json_file_name) as f:
             configs=json.load(f)
+        if key==PRESET_KEY:
+            if not os.path.exists(os.path.join(package_path,DEFAULT_PRESET_DEST,(f'{configs[key]}.json'))):
+                return default
         return configs.get(key,default)
     return default
 
@@ -123,42 +126,47 @@ def path_constructor(presetname):
         if os.path.exists(json_file_name):
             with open(json_file_name) as f:
                 configs=json.load(f)
-        
-            if configs[PRESET_KEY]!=PRESET_DEFAULT_ID:
-                preset_path=os.path.join(file_folder_path,(f"{configs[PRESET_KEY]}.json"))
-                
-                with open(preset_path) as f:
-                    f_names=json.load(f)
-                
-                images_folder_destination = f_names.get(TAG_IMAGE,images_folder_destination)
-                project_folder_destination = f_names.get(TAG_PROJECT,project_folder_destination)
-                model_folder_destination = f_names.get(TAG_MODEL,model_folder_destination)
-                material_folder_destination =f_names.get(TAG_MATERIAL,material_folder_destination)
-                video_folder_destination = f_names.get(TAG_VIDEO,video_folder_destination)
-                audio_folder_destination = f_names.get(TAG_AUDIO,audio_folder_destination)
-            
-        else:
             try:
-                preset_path=os.path.join(file_folder_path,(f"{presetname}.json"))
-                if os.path.exists(preset_path):
+                if configs[PRESET_KEY]!=PRESET_DEFAULT_ID:
+                    preset_path=os.path.join(file_folder_path,(f"{configs[PRESET_KEY]}.json"))
+                    
                     with open(preset_path) as f:
                         f_names=json.load(f)
-                
+                    
                     images_folder_destination = f_names.get(TAG_IMAGE,images_folder_destination)
                     project_folder_destination = f_names.get(TAG_PROJECT,project_folder_destination)
                     model_folder_destination = f_names.get(TAG_MODEL,model_folder_destination)
                     material_folder_destination =f_names.get(TAG_MATERIAL,material_folder_destination)
                     video_folder_destination = f_names.get(TAG_VIDEO,video_folder_destination)
                     audio_folder_destination = f_names.get(TAG_AUDIO,audio_folder_destination)
-                else:
-                    images_folder_destination = DEFAULT_IMAGE_DEST
-                    project_folder_destination = DEFAULT_PROJECT_DEST
-                    model_folder_destination = DEFAULT_MODEL_DEST
-                    material_folder_destination = DEFAULT_MATERIAL_DEST
-                    video_folder_destination = DEFAULT_VIDEO_DEST
-                    audio_folder_destination = DEFAULT_AUDIO_DEST
-            except Exception as e:
-                print(e)
+            except:
+                images_folder_destination = DEFAULT_IMAGE_DEST
+                project_folder_destination = DEFAULT_PROJECT_DEST
+                model_folder_destination = DEFAULT_MODEL_DEST
+                material_folder_destination = DEFAULT_MATERIAL_DEST
+                video_folder_destination = DEFAULT_VIDEO_DEST
+                audio_folder_destination = DEFAULT_AUDIO_DEST
+        else:
+            
+            preset_path=os.path.join(file_folder_path,(f"{presetname}.json"))
+            if os.path.exists(preset_path):
+                with open(preset_path) as f:
+                    f_names=json.load(f)
+            
+                images_folder_destination = f_names.get(TAG_IMAGE,images_folder_destination)
+                project_folder_destination = f_names.get(TAG_PROJECT,project_folder_destination)
+                model_folder_destination = f_names.get(TAG_MODEL,model_folder_destination)
+                material_folder_destination =f_names.get(TAG_MATERIAL,material_folder_destination)
+                video_folder_destination = f_names.get(TAG_VIDEO,video_folder_destination)
+                audio_folder_destination = f_names.get(TAG_AUDIO,audio_folder_destination)
+            else:
+                images_folder_destination = DEFAULT_IMAGE_DEST
+                project_folder_destination = DEFAULT_PROJECT_DEST
+                model_folder_destination = DEFAULT_MODEL_DEST
+                material_folder_destination = DEFAULT_MATERIAL_DEST
+                video_folder_destination = DEFAULT_VIDEO_DEST
+                audio_folder_destination = DEFAULT_AUDIO_DEST
+            
     else:
         images_folder_destination = DEFAULT_IMAGE_DEST
         project_folder_destination = DEFAULT_PROJECT_DEST

@@ -138,7 +138,6 @@ class ENUM_PROPS_Tags(bpy.types.PropertyGroup):
     tag: bpy.props.EnumProperty(
         items=[
             (TAG_EMPTY, 'none', 'No Tags'),
-            (TAG_PROJECT, 'project_files', "This tag is designated for storing files with extensions such as 'max,' '3ds,' 'blend,' 'c4d,' 'bgeo,' and 'geo.' Any files with these extensions will be organized and kept in this folder."),
             (TAG_MODEL, 'model_files', "This tag will be used to categorize and store files with specific extensions, including 'obj', 'fbx', 'usdz', 'dae', 'usd*', 'ply', 'glb', 'gltf', and 'x3d'. These files will be organized and kept in this designated folder."),
             (TAG_IMAGE, 'image_files', "This tag designates a folder where files with the following extensions will be stored: ['png', 'jpg', 'jpeg', 'exr', 'tiff', 'webp', 'gif', 'psd', 'indd', 'raw', 'svg', 'ai', 'tif']. These file types will be saved in the specified location."),
             (TAG_MATERIAL, 'material_files', "This tag designates a folder for storing files with specific extensions such as 'sbsar', 'spsm', 'spp', and 'sbs'."),
